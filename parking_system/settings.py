@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,24 +20,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Mover la SECRET_KEY a una variable de entorno para mayor seguridad
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-ur(&_h7gldf8k1&a7d976gt%c7%2a@3(3!v$zk#=_+f10cxd03')
+SECRET_KEY = 'django-insecure-ur(&_h7gldf8k1&a7d976gt%c7%2a@3(3!v$zk#=_+f10cxd03'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost']
+# Configuración de hosts permitidos
+ALLOWED_HOSTS = ['.sslip.io', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://*.sslip.io']
 
-# Configuraciones de seguridad para producción (descomentar en producción)
-# SECURE_SSL_REDIRECT = True  # Redirigir HTTP a HTTPS
-# SECURE_HSTS_SECONDS = 31536000  # HSTS por 1 año
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
-# SESSION_COOKIE_SECURE = True  # Cookies solo por HTTPS
-# CSRF_COOKIE_SECURE = True  # Cookies CSRF solo por HTTPS
-# SECURE_BROWSER_XSS_FILTER = True
-# SECURE_CONTENT_TYPE_NOSNIFF = True
+# Configuraciones de seguridad para producción
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Configuración de Crispy Forms para usar Tailwind
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
@@ -88,17 +87,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'parking_system.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# Database PostgreSQL en Coolify
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'jsPJTLqt2etMK1Fw5h9CrGiE5V19U4FGkBHoXqqSnTN7fG8pIxMuO7iP1x5JfAl7',
+        'HOST': 'g08kw8osokg4o0ok08wcsw0s',
+        'PORT': '5432',
     }
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -107,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
@@ -119,17 +119,15 @@ DECIMAL_SEPARATOR = ','
 NUMBER_GROUPING = 3
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Para recopilar archivos estáticos en producción
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (Uploaded files, like barcodes)
+# Media files (Uploaded files)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication URLs
@@ -138,9 +136,9 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Configuración de sesiones
-SESSION_COOKIE_AGE = 1209600  # 2 semanas en segundos
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # No expirar la sesión al cerrar el navegador
-SESSION_SAVE_EVERY_REQUEST = True  # Guardar la sesión en cada solicitud para actualizar el tiempo de expiración
+SESSION_COOKIE_AGE = 1209600  # 2 semanas
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Configuración de mensajes para usar clases de Tailwind
 MESSAGE_TAGS = {
