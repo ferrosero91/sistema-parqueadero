@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt
 FROM python:3.11-slim
 WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
-COPY --from=builder /app/ .
+COPY . .
 RUN useradd -m myuser
 USER myuser
 ENV PATH="/home/myuser/.local/bin:$PATH"
