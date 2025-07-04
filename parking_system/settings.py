@@ -29,7 +29,7 @@ DEBUG = False
 
 # Configuración de hosts permitidos
 ALLOWED_HOSTS = ['.sslip.io', 'localhost', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://*.sslip.io']
+CSRF_TRUSTED_ORIGINS = ['http://*.sslip.io']
 
 # Configuraciones de seguridad para producción
 SECURE_SSL_REDIRECT = True
