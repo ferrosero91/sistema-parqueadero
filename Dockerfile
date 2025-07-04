@@ -1,21 +1,14 @@
-# Imagen base de Python
-FROM python:3.11
-
-# Establecer el directorio de trabajo en el contenedor
+FROM python:3.11-slim AS builder
 WORKDIR /app
-
-# Copiar todos los archivos del proyecto al contenedor
-COPY . .
-
-# Actualizar pip e instalar dependencias
+COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+COPY . .
 
-# Recoger archivos estáticos al momento de construir la imagen
-RUN python manage.py collectstatic --noinput
-
-# Exponer el puerto 8080 porque Coolify ya usa el 8000 localmente
-EXPOSE 8080
-
-# Comando para ejecutar la aplicación con Gunicorn en el puerto 8080
-CMD ["gunicorn", "parking_system.wsgi:application", "--bind", "0.0.0.0:8080"]
+FROM python:3.11-slim
+WORKDIR /app
+COPY --from=builder /app /app
+RUN useradd -m myuser
+USER myuser
+ENV PATH="/home/myuser/.local/bin:$PATH"
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn parking_system.wsgi:application --bind 0.0.0.0:8080"]

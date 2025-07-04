@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -89,14 +91,11 @@ WSGI_APPLICATION = 'parking_system.wsgi.application'
 
 # Database PostgreSQL en Coolify
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'jsPJTLqt2etMK1Fw5h9CrGiE5V19U4FGkBHoXqqSnTN7fG8pIxMuO7iP1x5JfAl7',
-        'HOST': 'g08kw8osokg4o0ok08wcsw0s',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'postgres://postgres:jsPJTLqt2etMK1Fw5h9CrGiE5V19U4FGkBHoXqqSnTN7fG8pIxMuO7iP1x5JfAl7@g08kw8osokg4o0ok08wcsw0s:5432/postgres'),
+        conn_max_age=600,
+        ssl_require=False,
+    )
 }
 
 # Password validation
