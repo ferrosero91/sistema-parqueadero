@@ -1,0 +1,81 @@
+{% extends 'parking/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-8">
+    <!-- Encabezado del formulario -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Crear Categoría</h2>
+            <p class="text-sm text-gray-600">Defina una nueva categoría de vehículo</p>
+        </div>
+        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full">
+            <i class="fas fa-tags text-blue-600 text-lg"></i>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="relative {% if field.name == 'monthly_rate' %}hidden monthly-rate-field{% endif %}">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+                {% if field.label == 'Nombre' %}
+                <i class="fas fa-pen"></i>
+                {% elif field.label == 'Tarifa primera hora' %}
+                <i class="fas fa-clock"></i>
+                {% elif field.label == 'Tarifa hora adicional' %}
+                <i class="fas fa-plus"></i>
+                {% elif field.label == '¿Es mensual?' %}
+                <i class="fas fa-calendar-alt"></i>
+                {% elif field.label == 'Tarifa mensual' %}
+                <i class="fas fa-dollar-sign"></i>
+                {% endif %}
+            </div>
+            {% if field.errors %}
+            <p class="text-red-500 text-sm mt-2">{{ field.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="flex space-x-4">
+            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 shadow-md flex justify-center items-center">
+                <i class="fas fa-save mr-2"></i>
+                Guardar
+            </button>
+            <a href="{% url 'category-list' %}" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg text-sm font-medium hover:bg-gray-300 text-center">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const isMonthlyCheckbox = document.querySelector('#id_is_monthly');
+    const monthlyRateField = document.querySelector('.monthly-rate-field');
+
+    // Mostrar u ocultar el campo "monthly_rate" según el estado de "is_monthly"
+    function toggleMonthlyRateField() {
+        if (isMonthlyCheckbox.checked) {
+            monthlyRateField.classList.remove('hidden');
+        } else {
+            monthlyRateField.classList.add('hidden');
+            // Opcional: Limpiar el valor del campo cuando se oculta
+            document.querySelector('#id_monthly_rate').value = '';
+        }
+    }
+
+    // Ejecutar al cargar la página
+    toggleMonthlyRateField();
+
+    // Escuchar cambios en el checkbox
+    isMonthlyCheckbox.addEventListener('change', toggleMonthlyRateField);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'parking/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-8">
+    <!-- Encabezado del formulario -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Editar Categoría</h2>
+            <p class="text-sm text-gray-600">Ajuste los datos de la categoría seleccionada</p>
+        </div>
+        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full">
+            <i class="fas fa-tags text-blue-600 text-lg"></i>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="relative">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+                {% if field.label == 'Name' %}
+                <i class="fas fa-pen"></i>
+                {% elif field.label == 'First hour rate' %}
+                <i class="fas fa-clock"></i>
+                {% elif field.label == 'Additional hour rate' %}
+                <i class="fas fa-plus"></i>
+                {% elif field.label == 'Is monthly' %}
+                <i class="fas fa-calendar-alt"></i>
+                {% elif field.label == 'Monthly rate' %}
+                <i class="fas fa-dollar-sign"></i>
+                {% endif %}
+            </div>
+            {% if field.errors %}
+            <p class="text-red-500 text-sm mt-2">{{ field.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" 
+                class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 shadow-md flex justify-center items-center">
+            <i class="fas fa-save mr-2"></i>
+            Guardar Cambios
+        </button>
+    </form>
+</div>
+{% endblock %}
