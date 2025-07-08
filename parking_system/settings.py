@@ -13,7 +13,7 @@ SECRET_KEY = os.getenv(
 )
 
 # Debug
-DEBUG = os.getenv("DEBUG", "True") == "True"
+DEBUG = False
 
 # Hosts y CSRF
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
