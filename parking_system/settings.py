@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv(
 DEBUG = False
 
 # Hosts y CSRF
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','192.168.1.128', '192.168.1.128:3001']
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']
 
 # Seguridad en producción
@@ -85,7 +85,7 @@ DATABASES = {
     'default': dj_database_url.parse(
         "postgres://postgres:Frt2j39b3m123456@x04cws0g0w4w88gkck4kcgw4:5432/postgres",
         conn_max_age=600,
-        ssl_require=not DEBUG
+        ssl_require=False
     )
 }
 
