@@ -81,10 +81,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'parking_system.wsgi.application'
 
 # Base de datos con URL fija (la que aparece en Coolify)
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='postgres://postgres:Frt2j39b3m123456@x04cws0g0w4w88gkck4kcgw4:5432/postgres?sslmode=disable'
+#     )
+# }
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://postgres:Frt2j39b3m123456@x04cws0g0w4w88gkck4kcgw4:5432/postgres?sslmode=disable'
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'Frt2j39b3m123456',
+        'HOST': 'x04cws0g0w4w88gkck4kcgw4',
+        'PORT': '5432',
+    }
 }
 
 # Validadores de contraseñas
