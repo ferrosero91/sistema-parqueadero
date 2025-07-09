@@ -11,4 +11,4 @@ COPY . .
 RUN useradd -m myuser
 USER myuser
 ENV PATH="/home/myuser/.local/bin:$PATH"
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn parking_system.wsgi:application --bind 0.0.0.0:8080"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn parking_system.wsgi:application --bind 0.0.0.0:3001"]
