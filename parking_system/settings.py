@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv(
 DEBUG = False
 
 # Hosts y CSRF
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','192.168.1.128', '192.168.1.128:3001']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','192.168.1.128', '192.168.1.128:3001','https://parqueadero.sufactura.store']
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']
 
 # Seguridad en producción
