@@ -61,9 +61,6 @@ exec gunicorn parking_system.wsgi:application \\\n\
     --bind 0.0.0.0:8081 \\\n\
     --workers 3 \\\n\
     --timeout 120 \\\n\
-    --keepalive 2 \\\n\
-    --max-requests 1000 \\\n\
-    --max-requests-jitter 50 \\\n\
     --access-logfile - \\\n\
     --error-logfile -\n\
 ' > /app/start.sh && chmod +x /app/start.sh
