@@ -15,20 +15,37 @@ SECRET_KEY = os.getenv(
 # Debug
 DEBUG = False
 
-# Hosts y CSRF
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','192.168.1.128', '192.168.1.128:3001','https://parqueadero.sufactura.store']
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']
+# Hosts y CSRF - Mejorado para Coolify
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1',
+    '192.168.1.128', 
+    '192.168.1.128:3001',
+    'parqueadero.sufactura.store',  # Sin https://
+    '*.sufactura.store',  # Wildcards para subdominios
+    '*',  # Para desarrollo en Coolify
+]
 
-# Seguridad en producción
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost', 
+    'http://127.0.0.1',
+    'https://parqueadero.sufactura.store',
+    'http://192.168.1.128',
+    'http://192.168.1.128:3001',
+]
+
+# Seguridad en producción - Ajustado para Coolify
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Comentar SSL redirect para evitar problemas en Coolify
+    # SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
 else:
     SECURE_SSL_REDIRECT = False
 
@@ -80,23 +97,13 @@ TEMPLATES = [
 # WSGI
 WSGI_APPLICATION = 'parking_system.wsgi.application'
 
+# Base de datos
 DATABASES = {
     'default': dj_database_url.config(
         default="postgres://postgres:s2CJ8wi4dQwA4jP38wrMOKfHPjCyz5fRkGKX7FQ9WaiTLPCsnVxCs0ipe3tAylHq@jc800wgok88ggw4kkcgckgg8:5432/postgres"
+    )
+}
 
-     )
- }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'Frt2j39b3m123456',
-#         'HOST': '127.0.0.1',  # <-- Cambiado
-#         'PORT': '5432',
-#     }
-# }
 # Validadores de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -116,7 +123,7 @@ THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
 NUMBER_GROUPING = 3
 
-# Archivos estáticos
+# Archivos estáticos - Optimizado para contenedores
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -150,3 +157,47 @@ MESSAGE_TAGS = {
 # Configuración de crispy
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
+
+# Configuración de logging para producción
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'parking': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Configuración adicional para Coolify
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
