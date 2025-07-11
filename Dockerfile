@@ -12,7 +12,7 @@ WORKDIR /app
 # Crear usuario sin privilegios
 RUN useradd -m myuser
 
-# Copiar dependencias
+# Copiar dependencias del builder
 COPY --from=builder /root/.local /home/myuser/.local
 
 # Copiar el proyecto
@@ -32,37 +32,37 @@ ENV DJANGO_SUPERUSER_EMAIL=admin@example.com
 ENV DJANGO_SUPERUSER_PASSWORD=Admin123
 
 # Crear script de inicio
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-echo "Starting Django application..."\n\
-\n\
-# Aplicar migraciones\n\
-echo "Applying migrations..."\n\
-python manage.py migrate --noinput\n\
-\n\
-# Recopilar archivos estáticos\n\
-echo "Collecting static files..."\n\
-python manage.py collectstatic --noinput\n\
-\n\
-# Crear superusuario solo si no existe\n\
-echo "Creating superuser if not exists..."\n\
-python manage.py shell << EOF\n\
-from django.contrib.auth.models import User\n\
-if not User.objects.filter(username="$DJANGO_SUPERUSER_USERNAME").exists():\n\
-    User.objects.create_superuser("$DJANGO_SUPERUSER_USERNAME", "$DJANGO_SUPERUSER_EMAIL", "$DJANGO_SUPERUSER_PASSWORD")\n\
-    print("Superuser created successfully")\n\
-else:\n\
-    print("Superuser already exists")\n\
-EOF\n\
-\n\
-echo "Starting Gunicorn server..."\n\
-exec gunicorn parking_system.wsgi:application \\\n\
-    --bind 0.0.0.0:8081 \\\n\
-    --workers 3 \\\n\
-    --timeout 120 \\\n\
-    --access-logfile - \\\n\
-    --error-logfile -\n\
+RUN echo '#!/bin/bash
+set -e
+
+echo "Starting Django application..."
+
+# Aplicar migraciones
+echo "Applying migrations..."
+python manage.py migrate --noinput
+
+# Recopilar archivos estáticos
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
+
+# Crear superusuario solo si no existe
+echo "Creating superuser if not exists..."
+python manage.py shell << EOF
+from django.contrib.auth.models import User
+if not User.objects.filter(username="$DJANGO_SUPERUSER_USERNAME").exists():
+    User.objects.create_superuser("$DJANGO_SUPERUSER_USERNAME", "$DJANGO_SUPERUSER_EMAIL", "$DJANGO_SUPERUSER_PASSWORD")
+    print("Superuser created successfully")
+else:
+    print("Superuser already exists")
+EOF
+
+echo "Starting Gunicorn server..."
+exec gunicorn parking_system.wsgi:application \
+    --bind 0.0.0.0:8081 \
+    --workers 3 \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile -
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # Exponer puerto

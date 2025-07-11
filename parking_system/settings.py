@@ -17,17 +17,17 @@ DEBUG = False
 
 # Hosts y CSRF - Mejorado para Coolify
 ALLOWED_HOSTS = [
-    'localhost', 
+    'localhost',
     '127.0.0.1',
-    '192.168.1.128', 
+    '192.168.1.128',
     '192.168.1.128:3001',
-    'parqueadero.sufactura.store',  # Sin https://
-    '*.sufactura.store',  # Wildcards para subdominios
-    '*',  # Para desarrollo en Coolify
+    'parqueadero.sufactura.store',
+    '*.sufactura.store',
+    '*',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost', 
+    'http://localhost',
     'http://127.0.0.1',
     'https://parqueadero.sufactura.store',
     'http://192.168.1.128',
@@ -36,8 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Seguridad en producción - Ajustado para Coolify
 if not DEBUG:
-    # Comentar SSL redirect para evitar problemas en Coolify
-    # SECURE_SSL_REDIRECT = True
+    # SECURE_SSL_REDIRECT = True  # Puedes activarlo si ya usas HTTPS correctamente
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -66,6 +65,7 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise agregado aquí
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -123,10 +123,10 @@ THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
 NUMBER_GROUPING = 3
 
-# Archivos estáticos - Optimizado para contenedores
+# Archivos estáticos - Listo para producción
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Archivos multimedia
 MEDIA_URL = '/media/'
@@ -158,7 +158,7 @@ MESSAGE_TAGS = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-# Configuración de logging para producción
+# Logging para producción
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -197,7 +197,7 @@ LOGGING = {
     },
 }
 
-# Configuración adicional para Coolify
+# Configuración para Coolify y proxies
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
