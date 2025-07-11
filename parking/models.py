@@ -7,6 +7,10 @@ from io import BytesIO
 from django.core.files import File
 import barcode  # Asegúrate de que esta sea la librería correcta (python-barcode)
 from barcode.writer import ImageWriter
+import base64
+from io import BytesIO
+from barcode import Code128
+
 
 # VehicleCategory se mantiene igual
 class VehicleCategory(models.Model):
@@ -57,6 +61,13 @@ class ParkingTicket(models.Model):
 
     def __str__(self):
         return f"{self.placa} - {self.entry_time.strftime('%Y-%m-%d %H:%M')}"
+    
+    def get_barcode_base64(self):
+        buffer = BytesIO()
+        code = Code128(self.placa, writer=ImageWriter())
+        code.write(buffer)
+        base64_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        return f'data:image/png;base64,{base64_data}'
 
     def save(self, *args, **kwargs):
         # Generar el código de barras con la placa si no existe
@@ -76,6 +87,16 @@ class ParkingTicket(models.Model):
         if self.category.is_monthly and not self.monthly_expiry:
             self.monthly_expiry = self.entry_time + timedelta(days=30)
         super().save(*args, **kwargs)
+
+    """
+    def generate_barcode_image(self):
+        buffer = BytesIO()
+        code = Code128(self.placa, writer=ImageWriter())
+        code.write(buffer)
+        buffer.seek(0)
+        return ContentFile(buffer.read(), name=f'barcode_{self.placa}.png')
+    """
+    
 
     def calculate_fee(self):
         if self.exit_time:

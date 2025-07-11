@@ -78,7 +78,7 @@
    {% endif %}
 
    <div class="barcode">
-       <img src="{{ ticket.barcode.url }}" alt="Código de Barras">
+       <img src="{{ ticket.get_barcode_base64 }}" alt="Código de Barras">
    </div>
    
    <div style="text-align: center; border-top: 1px dashed black; padding-top: 5px; font-size: 10px;">
