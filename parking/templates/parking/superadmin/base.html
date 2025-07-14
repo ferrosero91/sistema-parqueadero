@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Empresas - SoluPark</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <style>
+        /* Estilos personalizados para mejor responsividad */
+        @media (max-width: 768px) {
+            .sidebar-mobile {
+                transform: translateX(-100%);
+            }
+            .sidebar-mobile.open {
+                transform: translateX(0);
+            }
+        }
+        
+        /* Overlay para móviles */
+        .sidebar-overlay {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-overlay {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 20;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Sidebar y contenido principal -->
+        <div class="flex-1 flex">
+            <!-- Overlay para móviles -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+            
+            <!-- Sidebar -->
+            {% if user.is_authenticated %}
+            <div id="sidebar" class="bg-indigo-800 text-white py-7 px-2 fixed inset-y-0 left-0 transform transition duration-200 ease-in-out z-30 md:relative md:translate-x-0 sidebar-mobile" style="width: 256px;">
+                <!-- Toggle button -->
+                <button id="toggle-sidebar" class="absolute -right-3 top-10 bg-indigo-800 text-white p-1 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none">
+                    <i id="toggle-icon" class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="flex items-center space-x-2 px-4 sidebar-full">
+                    <i class="fas fa-crown text-2xl"></i>
+                    <span class="text-2xl font-extrabold whitespace-nowrap">SoluPark Admin</span>
+                </div>
+
+                <nav class="flex flex-col space-y-2 mt-6">
+                    {% if request.session.temp_tenant_id %}
+                        <!-- Modo empresa activo -->
+                        <div class="px-4 py-2 text-xs text-indigo-200 uppercase sidebar-text">
+                            <i class="fas fa-building w-5 text-center"></i>
+                            <span class="ml-2 sidebar-full">Modo: {{ request.session.temp_tenant_name }}</span>
+                        </div>
+                        <a href="{% url 'exit-tenant-mode' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-red-700 flex items-center group relative">
+                            <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                            <span class="ml-2 sidebar-full">Salir del Modo Empresa</span>
+                            <span class="ml-2 hidden group-hover:block absolute left-full bg-red-900 px-2 py-1 rounded text-sm z-50">Salir del Modo Empresa</span>
+                        </a>
+                        <hr class="border-indigo-600 my-2">
+                    {% endif %}
+                    <div class="px-4 py-2 text-xs text-gray-300 uppercase sidebar-text">Administración</div>
+                    <a href="{% url 'superadmin-dashboard' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-700 flex items-center group relative">
+                        <i class="fas fa-chart-line w-5 text-center"></i>
+                        <span class="ml-2 sidebar-full">Dashboard</span>
+                        <span class="ml-2 hidden group-hover:block absolute left-full bg-indigo-900 px-2 py-1 rounded text-sm z-50">Dashboard</span>
+                    </a>
+
+                    <a href="{% url 'superadmin-tenant-list' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-700 flex items-center group relative">
+                        <i class="fas fa-building w-5 text-center"></i>
+                        <span class="ml-2 sidebar-full">Empresas</span>
+                        <span class="ml-2 hidden group-hover:block absolute left-full bg-indigo-900 px-2 py-1 rounded text-sm z-50">Empresas</span>
+                    </a>
+
+                    <a href="{% url 'superadmin-tenant-create' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-700 flex items-center group relative">
+                        <i class="fas fa-plus-circle w-5 text-center"></i>
+                        <span class="ml-2 sidebar-full">Crear Empresa</span>
+                        <span class="ml-2 hidden group-hover:block absolute left-full bg-indigo-900 px-2 py-1 rounded text-sm z-50">Crear Empresa</span>
+                    </a>
+
+                    <div class="px-4 py-2 text-xs text-gray-300 uppercase mt-4 sidebar-text">Sistema</div>
+
+                    <a href="{% url 'admin:index' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-700 flex items-center group relative">
+                        <i class="fas fa-cog w-5 text-center"></i>
+                        <span class="ml-2 sidebar-full">Admin Django</span>
+                        <span class="ml-2 hidden group-hover:block absolute left-full bg-indigo-900 px-2 py-1 rounded text-sm z-50">Admin Django</span>
+                    </a>
+
+                    <a href="{% url 'logout' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-700 flex items-center group relative">
+                        <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                        <span class="ml-2 sidebar-full">Cerrar Sesión</span>
+                        <span class="ml-2 hidden group-hover:block absolute left-full bg-indigo-900 px-2 py-1 rounded text-sm z-50">Cerrar Sesión</span>
+                    </a>
+                </nav>
+
+                <div class="px-4 mt-auto pt-6">
+                    <form action="{% url 'logout' %}" method="post" class="sidebar-full">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                            <i class="fas fa-power-off"></i>
+                            <span class="ml-2">Salir</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col">
+                <!-- Top bar para móviles -->
+                <div class="bg-white p-4 shadow-md md:hidden flex justify-between items-center">
+                    <button onclick="openSidebar()" class="mobile-menu-button p-2 hover:bg-indigo-100 rounded focus:outline-none">
+                        <i class="fas fa-bars text-indigo-800"></i>
+                    </button>
+                    <span class="font-bold text-indigo-800">SoluPark Admin</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">{{ user.username }}</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <main class="flex-grow p-4 md:p-6 bg-gray-50 overflow-auto pb-16">
+                    <div class="max-w-7xl mx-auto">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+                </main>
+
+                <!-- Footer -->
+                <footer class="bg-indigo-800 text-white py-3 px-4 md:px-6">
+                    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-sm space-y-2 md:space-y-0">
+                        <div class="text-center md:text-left">
+                            <p>© 2025 Soluciones Web - Panel de Administración</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="hidden md:inline">Contacto:</span>
+                            <a href="https://wa.me/573117098269" target="_blank" 
+                               class="hover:text-green-400 flex items-center transition duration-200">
+                                <i class="fab fa-whatsapp text-lg mr-1"></i>
+                                <span class="hidden sm:inline">+57 311 709 8269</span>
+                                <span class="sm:hidden">WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggle-sidebar');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const sidebarFullElements = document.querySelectorAll('.sidebar-full');
+        const sidebarTextElements = document.querySelectorAll('.sidebar-text');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        let isExpanded = true;
+
+        // Funciones para móviles
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.style.display = 'block';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.style.display = 'none';
+        }
+
+        // Cerrar sidebar al hacer clic en un enlace (móviles)
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Toggle sidebar para desktop
+        toggleBtn?.addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                isExpanded = !isExpanded;
+                
+                if (isExpanded) {
+                    sidebar.style.width = '256px';
+                    toggleIcon.className = 'fas fa-chevron-left';
+                    sidebarFullElements.forEach(el => el.style.display = 'block');
+                    sidebarTextElements.forEach(el => el.style.display = 'block');
+                } else {
+                    sidebar.style.width = '64px';
+                    toggleIcon.className = 'fas fa-chevron-right';
+                    sidebarFullElements.forEach(el => el.style.display = 'none');
+                    sidebarTextElements.forEach(el => el.style.display = 'none');
+                }
+            }
+        });
+
+        // Cerrar sidebar al hacer clic fuera (móviles)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !e.target.closest('.mobile-menu-button')) {
+                closeSidebar();
+            }
+        });
+
+        // Ajustar sidebar en resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open');
+                sidebarOverlay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

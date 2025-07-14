@@ -1,0 +1,414 @@
+{% extends 'parking/base.html' %}
+{% load static %}
+{% block extra_head %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+    <!-- Header con título dinámico -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-600 mb-1">Gestión de Caja</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="reloadHistorial()" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros - Glassmorphism -->
+    <div class="bg-white/80 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
+            </svg>
+            Filtros de Búsqueda
+        </h3>
+        <form id="filter-form" method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div>
+                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700 mb-2">Fecha inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" />
+            </div>
+            <div>
+                <label for="fecha_fin" class="block text-sm font-medium text-gray-700 mb-2">Fecha fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" value="{{ request.GET.fecha_fin }}" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" />
+            </div>
+            <div>
+                <label for="usuario" class="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+                <input type="text" id="usuario" name="usuario" value="{{ request.GET.usuario }}" placeholder="Usuario apertura" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" />
+            </div>
+            <div>
+                <label for="diferencia" class="block text-sm font-medium text-gray-700 mb-2">Diferencia</label>
+                <select id="diferencia" name="diferencia" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                    <option value="">Todos</option>
+                    <option value="si" {% if request.GET.diferencia == 'si' %}selected{% endif %}>Con diferencia</option>
+                    <option value="no" {% if request.GET.diferencia == 'no' %}selected{% endif %}>Sin diferencia</option>
+                </select>
+            </div>
+            <div>
+                <label for="forma_pago" class="block text-sm font-medium text-gray-700 mb-2">Forma de pago</label>
+                <select id="forma_pago" name="forma_pago" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                    <option value="">Todas</option>
+                    <option value="efectivo" {% if request.GET.forma_pago == 'efectivo' %}selected{% endif %}>Efectivo</option>
+                    <option value="datafono" {% if request.GET.forma_pago == 'datafono' %}selected{% endif %}>Datáfono</option>
+                    <option value="transferencia" {% if request.GET.forma_pago == 'transferencia' %}selected{% endif %}>Transferencia</option>
+                    <option value="otro" {% if request.GET.forma_pago == 'otro' %}selected{% endif %}>Otro</option>
+                </select>
+            </div>
+        </form>
+        <div class="flex flex-wrap gap-3 mt-6">
+            <button type="submit" form="filter-form" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Filtrar
+            </button>
+            <button type="button" onclick="exportarPDF()" id="export-pdf-btn" class="bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span id="export-text">Exportar PDF</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Acciones rápidas - Glassmorphism -->
+    <div class="bg-white/80 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Acciones Rápidas
+        </h3>
+        <div class="flex flex-wrap gap-4">
+            <a href="{% url 'apertura_turno' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Abrir Turno
+            </a>
+            <a href="{% url 'registrar_movimiento' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Registrar Movimiento
+            </a>
+            <a href="{% url 'cierre_turno' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Cerrar Turno
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabla de turnos - Glassmorphism -->
+    <div class="bg-white/80 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Historial de Turnos
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-200">
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Apertura</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Cierre</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Usuario Apertura</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Usuario Cierre</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Ingresos</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Egresos</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Esperado</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Contado</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Diferencia</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Estado</th>
+                        <th class="text-left py-4 px-6 font-semibold text-gray-700">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turno in turnos %}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-200">
+                        <td class="py-4 px-6 text-gray-700">{{ turno.fecha_apertura|date:'d/m/Y H:i' }}</td>
+                        <td class="py-4 px-6 text-gray-700">{{ turno.fecha_cierre|date:'d/m/Y H:i'|default:'-' }}</td>
+                        <td class="py-4 px-6 text-gray-700">{{ turno.usuario_apertura.username }}</td>
+                        <td class="py-4 px-6 text-gray-700">{{ turno.usuario_cierre.username|default:'-' }}</td>
+                        <td class="py-4 px-6 font-semibold text-green-700">${{ turno.total_ingresos }}</td>
+                        <td class="py-4 px-6 font-semibold text-red-700">${{ turno.total_egresos }}</td>
+                        <td class="py-4 px-6 text-gray-700">${{ turno.total_esperado }}</td>
+                        <td class="py-4 px-6 text-gray-700">${{ turno.monto_real_contado|default:'-' }}</td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {% if turno.alerta_diferencia %}bg-red-100 text-red-800 animate-pulse{% else %}bg-green-100 text-green-800{% endif %}">
+                                ${{ turno.diferencia|default:'-' }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {% if turno.estado == 'abierto' %}bg-green-100 text-green-800{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{% if turno.estado == 'abierto' %}M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z{% else %}M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z{% endif %}"/>
+                                </svg>
+                                {{ turno.get_estado_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <button type="button" class="detalle-btn inline-flex items-center px-3 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 text-indigo-700 rounded-lg shadow-sm text-xs font-semibold transition-all duration-200 transform hover:scale-105" onclick="toggleDetalle('detalle-{{ forloop.counter }}')">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                                Ver detalle
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="detalle-{{ forloop.counter }}" class="hidden bg-gray-50/50">
+                        <td colspan="11" class="p-0">
+                            <div class="p-6">
+                                <h4 class="font-semibold text-indigo-700 mb-4 flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Movimientos del turno
+                                </h4>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm border rounded-lg">
+                                        <thead>
+                                            <tr class="bg-gray-200">
+                                                <th class="px-4 py-2 text-left">Fecha</th>
+                                                <th class="px-4 py-2 text-left">Tipo</th>
+                                                <th class="px-4 py-2 text-left">Categoría</th>
+                                                <th class="px-4 py-2 text-left">Monto</th>
+                                                <th class="px-4 py-2 text-left">Forma de pago</th>
+                                                <th class="px-4 py-2 text-left">Usuario</th>
+                                                <th class="px-4 py-2 text-left">Descripción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for mov in turno.movimientos.all %}
+                                            <tr class="border-b border-gray-100 hover:bg-gray-50/50">
+                                                <td class="px-4 py-2 text-gray-700">{{ mov.fecha|date:'d/m/Y H:i' }}</td>
+                                                <td class="px-4 py-2">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {% if mov.tipo == 'ingreso' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                                        {{ mov.get_tipo_display }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-2 text-gray-700">{{ mov.get_categoria_display }}</td>
+                                                <td class="px-4 py-2 font-semibold {% if mov.tipo == 'ingreso' %}text-green-600{% else %}text-red-600{% endif %}">${{ mov.monto }}</td>
+                                                <td class="px-4 py-2 text-gray-700">{{ mov.get_forma_pago_display }}</td>
+                                                <td class="px-4 py-2 text-gray-700">{{ mov.usuario.username }}</td>
+                                                <td class="px-4 py-2 text-gray-600">{{ mov.descripcion|default:'-' }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="7" class="text-center text-gray-400 py-4">
+                                                    <div class="flex flex-col items-center">
+                                                        <svg class="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                                        </svg>
+                                                        <p class="text-sm">Sin movimientos</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11" class="py-12 px-6 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                <p class="text-lg font-medium">No hay turnos registrados aún</p>
+                                <p class="text-sm text-gray-400">Los turnos aparecerán aquí cuando se registren</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleDetalle(id) {
+    var row = document.getElementById(id);
+    if (row.classList.contains('hidden')) {
+        row.classList.remove('hidden');
+    } else {
+        row.classList.add('hidden');
+    }
+}
+
+function reloadHistorial() {
+    location.reload();
+}
+
+function exportarPDF() {
+    // Obtener el botón y cambiar su estado
+    var btn = document.getElementById('export-pdf-btn');
+    var text = document.getElementById('export-text');
+    
+    if (!btn || !text) {
+        console.error('No se encontraron los elementos del botón');
+        return;
+    }
+    
+    var originalText = text.textContent;
+    var originalClass = btn.className;
+    
+    // Cambiar a estado de carga
+    btn.disabled = true;
+    btn.className = originalClass.replace('from-red-600 to-pink-600', 'from-gray-400 to-gray-500');
+    text.textContent = 'Generando PDF...';
+    
+    // Obtener los valores actuales de los filtros
+    var fechaInicio = document.getElementById('fecha_inicio') ? document.getElementById('fecha_inicio').value : '';
+    var fechaFin = document.getElementById('fecha_fin') ? document.getElementById('fecha_fin').value : '';
+    var usuario = document.getElementById('usuario') ? document.getElementById('usuario').value : '';
+    var diferencia = document.getElementById('diferencia') ? document.getElementById('diferencia').value : '';
+    var formaPago = document.getElementById('forma_pago') ? document.getElementById('forma_pago').value : '';
+    
+    // Construir la URL con los parámetros
+    var url = '{% url "historial_cuadre_caja" %}?exportar_pdf=1';
+    
+    if (fechaInicio) url += '&fecha_inicio=' + encodeURIComponent(fechaInicio);
+    if (fechaFin) url += '&fecha_fin=' + encodeURIComponent(fechaFin);
+    if (usuario) url += '&usuario=' + encodeURIComponent(usuario);
+    if (diferencia) url += '&diferencia=' + encodeURIComponent(diferencia);
+    if (formaPago) url += '&forma_pago=' + encodeURIComponent(formaPago);
+    
+    console.log('URL de exportación:', url);
+    
+    // Usar fetch para manejar mejor los errores
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'same-origin'
+    })
+    .then(function(response) {
+        console.log('Respuesta del servidor:', response.status, response.statusText);
+        
+        if (response.ok) {
+            // Verificar si la respuesta es un PDF
+            var contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/pdf')) {
+                return response.blob();
+            } else {
+                // Si no es PDF, intentar leer como JSON para obtener el error
+                return response.json().then(function(data) {
+                    throw new Error(data.error || 'La respuesta no es un PDF válido');
+                });
+            }
+        } else {
+            return response.json().then(function(data) {
+                throw new Error(data.error || 'Error en la respuesta del servidor: ' + response.status);
+            });
+        }
+    })
+    .then(function(blob) {
+        console.log('PDF recibido, tamaño:', blob.size);
+        
+        // Crear URL para descarga
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'historial_cuadre_caja_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        // Restaurar el botón
+        btn.disabled = false;
+        btn.className = originalClass;
+        text.textContent = originalText;
+        
+        // Mostrar mensaje de éxito
+        showNotification('PDF generado exitosamente', 'success');
+    })
+    .catch(function(error) {
+        console.error('Error al generar PDF:', error);
+        
+        // Restaurar el botón
+        btn.disabled = false;
+        btn.className = originalClass;
+        text.textContent = originalText;
+        
+        // Mostrar mensaje de error
+        showNotification('Error al generar PDF: ' + error.message, 'error');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showNotification(message, type) {
+    // Crear notificación
+    var notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full';
+    
+    if (type === 'success') {
+        notification.className += ' bg-green-500 text-white';
+    } else {
+        notification.className += ' bg-red-500 text-white';
+    }
+    
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === 'success' ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}"/>
+            </svg>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remover después de 5 segundos para errores
+    var duration = type === 'error' ? 5000 : 3000;
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, duration);
+}
+</script>
+{% endblock %} 

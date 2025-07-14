@@ -1,0 +1,195 @@
+{% extends 'parking/superadmin/base.html' %}
+
+{% block title %}Detalles de {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+            
+                    <p class="mt-1 text-sm text-gray-500">Detalles de la empresa</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'superadmin-tenant-list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Volver a la Lista
+                    </a>
+                    <a href="{% url 'superadmin-tenant-edit' tenant.pk %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Editar
+                    </a>
+                    <a href="{% url 'superadmin-tenant-login' tenant.pk %}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                        Acceder como Empresa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Info -->
+            <div class="lg:col-span-2">
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Información de la Empresa</h3>
+                        
+                        <!-- Status Alert -->
+                        {% if not tenant.is_active %}
+                        <div class="rounded-md bg-red-50 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Empresa Inactiva</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <p>Esta empresa está actualmente desactivada. Los usuarios no pueden acceder a sus datos.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Company Details -->
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Nombre</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.name }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Identificador</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.slug }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">NIT</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.nit }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Teléfono</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.telefono }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.email|default:"No especificado" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Estado</dt>
+                                <dd class="mt-1">
+                                    {% if tenant.is_active %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <svg class="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 8 8">
+                                                <circle cx="4" cy="4" r="3"/>
+                                            </svg>
+                                            Activa
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <svg class="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 8 8">
+                                                <circle cx="4" cy="4" r="3"/>
+                                            </svg>
+                                            Inactiva
+                                        </span>
+                                    {% endif %}
+                                </dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-gray-500">Dirección</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.direccion }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Fecha de Creación</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.created_at|date:"d/m/Y H:i" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Última Actualización</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ tenant.updated_at|date:"d/m/Y H:i" }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="lg:col-span-1">
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Estadísticas</h3>
+                        
+                        <dl class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Total Tickets</dt>
+                                <dd class="text-lg font-semibold text-gray-900">{{ total_tickets }}</dd>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Tickets Activos</dt>
+                                <dd class="text-lg font-semibold text-blue-600">{{ active_tickets }}</dd>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Ingresos Totales</dt>
+                                <dd class="text-lg font-semibold text-green-600">${{ total_revenue|floatformat:0 }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="bg-white shadow rounded-lg mt-6">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Acciones</h3>
+                        
+                        <div class="space-y-3">
+                            <form method="post" action="{% url 'superadmin-tenant-toggle-status' tenant.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md {% if tenant.is_active %}text-red-700 bg-red-100 hover:bg-red-200{% else %}text-green-700 bg-green-100 hover:bg-green-200{% endif %} focus:outline-none focus:ring-2 focus:ring-offset-2 {% if tenant.is_active %}focus:ring-red-500{% else %}focus:ring-green-500{% endif %}">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        {% if tenant.is_active %}
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"/>
+                                        {% else %}
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        {% endif %}
+                                    </svg>
+                                    {% if tenant.is_active %}Desactivar Empresa{% else %}Activar Empresa{% endif %}
+                                </button>
+                            </form>
+                            
+                            <a href="{% url 'superadmin-tenant-edit' tenant.pk %}" 
+                               class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Editar Información
+                            </a>
+                            
+                            <a href="{% url 'superadmin-tenant-login' tenant.pk %}" 
+                               class="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                </svg>
+                                Acceder como Empresa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -2,17 +2,42 @@
 {% load static %}
 
 {% block content %}
-<div class="p-6">
-    <!-- Filtro de fechas -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-        <form method="get" class="flex flex-col md:flex-row gap-4">
-            <div>
+<div class="p-6 space-y-8">
+    <!-- Encabezado y acciones -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <div>
+    
+            <p class="text-gray-500">Resumen profesional de ingresos y movimientos del parqueadero.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&export=excel" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow transition">
+                <span class="material-icons">table_view</span> Exportar Excel
+            </a>
+            <a href="?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&export=pdf" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow transition">
+                <span class="material-icons">picture_as_pdf</span> Exportar PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white p-4 rounded-lg shadow mb-4">
+        <form method="get" class="flex flex-col md:flex-row md:items-end gap-4">
+            <div class="flex flex-col gap-1">
                 <label class="block text-sm font-medium text-gray-700">Fecha Inicio</label>
                 <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
             </div>
-            <div>
+            <div class="flex flex-col gap-1">
                 <label class="block text-sm font-medium text-gray-700">Fecha Fin</label>
                 <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="block text-sm font-medium text-gray-700">Filtro rápido</label>
+                <div class="flex gap-1">
+                    <button type="submit" name="quick_filter" value="hoy" class="px-3 py-1 rounded-lg border text-xs font-semibold transition {% if quick_filter == 'hoy' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Hoy</button>
+                    <button type="submit" name="quick_filter" value="semana" class="px-3 py-1 rounded-lg border text-xs font-semibold transition {% if quick_filter == 'semana' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Semana</button>
+                    <button type="submit" name="quick_filter" value="mes" class="px-3 py-1 rounded-lg border text-xs font-semibold transition {% if quick_filter == 'mes' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Mes</button>
+                    <button type="submit" name="quick_filter" value="anio" class="px-3 py-1 rounded-lg border text-xs font-semibold transition {% if quick_filter == 'anio' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Año</button>
+                </div>
             </div>
             <div class="flex items-end">
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
@@ -20,6 +45,29 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- Tarjetas de formas de pago (solo si hay filtro de fechas) -->
+    {% if start_date and end_date %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {% for forma in formas_pago_list %}
+        <div class="{{ forma.color }} text-white p-4 rounded-xl shadow flex flex-col items-center relative group transition-transform hover:scale-105">
+            <span class="material-icons text-3xl mb-1">{{ forma.icono }}</span>
+            <h3 class="font-bold text-base">{{ forma.nombre }}</h3>
+            <p class="text-xl font-semibold mt-1">${{ forma.valor|floatformat:2 }}</p>
+            <div class="text-xs mt-1 opacity-80">{{ forma.porcentaje|floatformat:1 }}%</div>
+            <div class="absolute top-2 right-2 bg-white/20 rounded-full px-2 py-1 text-xs font-bold group-hover:bg-white/40 transition">{{ forma.clave|title }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Gráfico de ingresos diarios -->
+    <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center">
+        <h3 class="font-bold text-lg mb-4 text-gray-700">Ingresos Diarios</h3>
+        <div class="w-full max-w-3xl" style="height: 400px;">
+            <canvas id="revenueChart"></canvas>
+        </div>
     </div>
 
     <!-- Resumen general -->
@@ -96,51 +144,65 @@
             </div>
         </div>
     </div>
-
-    <!-- Gráfico de ingresos diarios -->
-    <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
-        <h2 class="font-bold text-lg border-b pb-4">Ingresos Diarios</h2>
-        <div class="p-4" style="height: 300px;">
-            <canvas id="revenueChart"></canvas>
-        </div>
-    </div>
 </div>
+
+{% if advertencia_descuadre %}
+<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-4 rounded-lg shadow">
+    <span class="font-bold">Advertencia:</span> {{ advertencia_descuadre }}
+</div>
+{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {{ daily_stats|json_script:"dailyStats" }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de ingresos diarios (barras)
     const ctx = document.getElementById('revenueChart').getContext('2d');
     const dailyStats = JSON.parse(document.getElementById('dailyStats').textContent);
-    
-    const chart = new Chart(ctx, {
-        type: 'line',
+    const barChart = new Chart(ctx, {
+        type: 'bar',
         data: {
             labels: dailyStats.map(stat => stat.date),
             datasets: [{
                 label: 'Ingresos ($)',
                 data: dailyStats.map(stat => stat.revenue),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
                 borderColor: 'rgb(59, 130, 246)',
-                tension: 0.1,
-                fill: false
+                borderWidth: 2,
+                borderRadius: 8,
+                maxBarThickness: 40,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
+                legend: { display: false },
                 title: {
-                    display: true,
-                    text: 'Ingresos Diarios'
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Ingresos: $${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
                 }
             },
             scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#374151', font: { weight: 'bold' } }
+                },
                 y: {
                     beginAtZero: true,
+                    grid: { color: '#e5e7eb' },
                     ticks: {
                         callback: function(value) {
                             return '$' + value;
-                        }
+                        },
+                        color: '#374151',
+                        font: { weight: 'bold' }
                     }
                 }
             }

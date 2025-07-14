@@ -4,147 +4,1277 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Estacionamiento</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <style>
+        /* Reset y configuración base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* Variables CSS para temas ULTRA PREMIUM */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary-color: #6366f1;
+            --accent-color: #818cf8;
+            --sidebar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --footer-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-light: #ffffff;
+            --text-muted: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-strong: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Tema ULTRA PREMIUM - Indigo Glass */
+        [data-theme="blue"] {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary-color: #6366f1;
+            --accent-color: #818cf8;
+            --sidebar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --footer-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-light: #ffffff;
+            --text-muted: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tema ULTRA PREMIUM - Dark Glass */
+        [data-theme="dark"] {
+            --primary-color: #1e293b;
+            --primary-dark: #0f172a;
+            --primary-light: #334155;
+            --secondary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --sidebar-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            --footer-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --text-light: #f8fafc;
+            --text-muted: #cbd5e1;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Tema ULTRA PREMIUM - Emerald Glass */
+        [data-theme="emerald"] {
+            --primary-color: #059669;
+            --primary-dark: #047857;
+            --primary-light: #10b981;
+            --secondary-color: #059669;
+            --accent-color: #10b981;
+            --sidebar-bg: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+            --footer-bg: linear-gradient(135deg, #059669 0%, #047857 100%);
+            --text-light: #f0fdf4;
+            --text-muted: #bbf7d0;
+            --glass-bg: rgba(5, 150, 105, 0.1);
+            --glass-border: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Tema ULTRA PREMIUM - Purple Glass */
+        [data-theme="purple"] {
+            --primary-color: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #a855f7;
+            --secondary-color: #7c3aed;
+            --accent-color: #a855f7;
+            --sidebar-bg: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+            --footer-bg: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            --text-light: #faf5ff;
+            --text-muted: #c4b5fd;
+            --glass-bg: rgba(124, 58, 237, 0.1);
+            --glass-border: rgba(168, 85, 247, 0.3);
+        }
+
+        /* Tema ULTRA PREMIUM - Rose Glass */
+        [data-theme="indigo"] {
+            --primary-color: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #6366f1;
+            --secondary-color: #4f46e5;
+            --accent-color: #6366f1;
+            --sidebar-bg: linear-gradient(135deg, #4f46e5 0%, #4338ca 50%, #3730a3 100%);
+            --footer-bg: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            --text-light: #eef2ff;
+            --text-muted: #c7d2fe;
+            --glass-bg: rgba(79, 70, 229, 0.1);
+            --glass-border: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Tema ULTRA PREMIUM - Slate Glass */
+        [data-theme="slate"] {
+            --primary-color: #475569;
+            --primary-dark: #334155;
+            --primary-light: #64748b;
+            --secondary-color: #475569;
+            --accent-color: #64748b;
+            --sidebar-bg: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%);
+            --footer-bg: linear-gradient(135deg, #475569 0%, #334155 100%);
+            --text-light: #f8fafc;
+            --text-muted: #cbd5e1;
+            --glass-bg: rgba(71, 85, 105, 0.1);
+            --glass-border: rgba(100, 116, 139, 0.3);
+        }
+
+        /* Tema ULTRA PREMIUM - Rose Glass */
+        [data-theme="rose"] {
+            --primary-color: #e11d48;
+            --primary-dark: #be123c;
+            --primary-light: #f43f5e;
+            --secondary-color: #e11d48;
+            --accent-color: #f43f5e;
+            --sidebar-bg: linear-gradient(135deg, #e11d48 0%, #be123c 50%, #9f1239 100%);
+            --footer-bg: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            --text-light: #fff1f2;
+            --text-muted: #fecdd3;
+            --glass-bg: rgba(225, 29, 72, 0.1);
+            --glass-border: rgba(244, 63, 94, 0.3);
+        }
+
+        /* Tema ULTRA PREMIUM - Amber Glass */
+        [data-theme="amber"] {
+            --primary-color: #d97706;
+            --primary-dark: #b45309;
+            --primary-light: #f59e0b;
+            --secondary-color: #d97706;
+            --accent-color: #f59e0b;
+            --sidebar-bg: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+            --footer-bg: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            --text-light: #fffbeb;
+            --text-muted: #fde68a;
+            --glass-bg: rgba(217, 119, 6, 0.1);
+            --glass-border: rgba(245, 158, 11, 0.3);
+        }
+
+        /* Layout principal - Estilo ULTRA PREMIUM */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-layout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Sidebar principal - Estilo ULTRA PREMIUM Glassmorphism */
+        .admin-sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-strong);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Header del sidebar - Glassmorphism */
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-brand-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-brand-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-radius: 12px;
+        }
+
+        .sidebar-brand-icon:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .sidebar-brand-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .sidebar-brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        /* Navegación del sidebar */
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            margin: 0 0.5rem 0.375rem 0.5rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover {
+            background: var(--glass-bg);
+            color: #ffffff;
+            transform: translateX(4px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .nav-item.active {
+            background: var(--glass-bg);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+        }
+
+        .nav-item.active::before {
+            opacity: 1;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Sección de usuario en el sidebar */
+        .sidebar-user {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .user-details h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Contenido principal */
+        .admin-content {
+            flex: 1;
+            margin-left: 320px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header móvil */
+        .mobile-header {
+            display: none;
+            background: #ffffff;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #495057;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: var(--shadow-strong);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .content-header {
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .content-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .content-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-body {
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        /* Footer */
+        .admin-footer {
+            background: var(--footer-bg);
+            color: var(--text-light);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .footer-contact {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .footer-contact a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-contact a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                width: 300px;
+            }
+            .admin-content {
+                margin-left: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                width: 320px;
+            }
+            
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .admin-content {
+                margin-left: 0;
+            }
+            
+            .mobile-header {
+                display: block;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .content-header {
+                padding: 1rem 1.5rem;
+            }
+            
+            .content-body {
+                padding: 1.5rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        /* Overlay para móviles */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+
+        /* Mejoras para componentes */
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #229954, #1e8449);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Selector de tema - ULTRA PREMIUM */
+        .theme-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .theme-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 0.875rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn::before {
+            content: '';
+            position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .theme-btn:hover {
+            background: var(--glass-bg);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .theme-btn:hover::before {
+            opacity: 1;
+        }
+
+        .theme-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-strong);
+            z-index: 1000;
+            display: none;
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .theme-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .theme-option {
+            padding: 0.875rem 1rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .theme-option:hover {
+            background: var(--glass-bg);
+            transform: translateX(4px);
+        }
+
+        .theme-option:hover::before {
+            opacity: 1;
+        }
+
+        .theme-option.active {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .theme-option.active::before {
+            opacity: 1;
+        }
+
+        .theme-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-option:hover .theme-color {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-color.blue {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .theme-color.dark {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+
+        .theme-color.emerald {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .theme-color.purple {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+
+        .theme-color.indigo {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+        }
+
+        .theme-color.slate {
+            background: linear-gradient(135deg, #475569, #334155);
+        }
+
+        .theme-color.rose {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+        }
+
+        .theme-color.amber {
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen flex flex-col">
-        <!-- Sidebar y contenido principal -->
-        <div class="flex-1 flex">
+<body>
+    <div class="admin-layout">
+            <!-- Overlay para móviles -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+            
             <!-- Sidebar -->
             {% if user.is_authenticated %}
-            <div id="sidebar" class="bg-blue-800 text-white py-7 px-2 fixed inset-y-0 left-0 transform transition duration-200 ease-in-out z-30 md:relative md:translate-x-0" style="width: 256px;">
-                <!-- Toggle button -->
-                <button id="toggle-sidebar" class="absolute -right-3 top-10 bg-blue-800 text-white p-1 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none">
-                    <i id="toggle-icon" class="fas fa-chevron-left"></i>
-                </button>
-
-                <div class="flex items-center space-x-2 px-4 sidebar-full">
-                    <i class="fas fa-parking text-2xl"></i>
-                    <span class="text-2xl font-extrabold whitespace-nowrap">SoluPark</span>
+        <aside id="sidebar" class="admin-sidebar">
+            <!-- Header del sidebar -->
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <i class="fas fa-parking"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <h1>SoluPark</h1>
+                        <p>Sistema de Estacionamiento</p>
+                    </div>
+                </div>
                 </div>
 
-                <nav class="flex flex-col space-y-2 mt-6">
-                    <div class="px-4 py-2 text-xs text-gray-300 uppercase sidebar-text">Menú Principal</div>
-                    <a href="{% url 'dashboard' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-chart-line w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Dashboard</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Dashboard</span>
-                    </a>
-
-                    <a href="{% url 'vehicle-entry' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-car w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Nuevo Ingreso</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Nuevo Ingreso</span>
-                    </a>
-
-                    <a href="{% url 'vehicle-exit' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-sign-out-alt w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Salida</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Salida</span>
-                    </a>
-
-                    <div class="px-4 py-2 text-xs text-gray-300 uppercase mt-4 sidebar-text">Administración</div>
-
-                    <a href="{% url 'company_profile' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-building w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Mi Empresa</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Mi Empresa</span>
-                    </a>
-
-                    <a href="{% url 'category-list' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-tags w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Categorías</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Categorías</span>
-                    </a>
-
-                    <a href="{% url 'reports' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-file-alt w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Reportes</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Reportes</span>
-                    </a>
-
-                    <a href="{% url 'cash_register' %}" class="py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 flex items-center group relative">
-                        <i class="fas fa-file-alt w-5 text-center"></i>
-                        <span class="ml-2 sidebar-full">Cuadre de Caja</span>
-                        <span class="ml-2 hidden group-hover:block absolute left-full bg-blue-900 px-2 py-1 rounded text-sm z-50">Reportes</span>
-                    </a>
-                </nav>
-
-                <div class="px-4 mt-auto pt-6">
-                    <form action="{% url 'logout' %}" method="post" class="sidebar-full">
-                        {% csrf_token %}
-                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                            <i class="fas fa-power-off"></i>
-                            <span class="ml-2">Salir</span>
-                        </button>
-                    </form>
+            <!-- Información del modo empresa -->
+                {% if user.is_superuser and request.session.temp_tenant_id %}
+            <div class="nav-section">
+                <div class="nav-section-title">Modo Empresa</div>
+                <div style="padding: 0 1.5rem 1rem; font-size: 0.75rem; color: #f39c12;">
+                    <i class="fas fa-building" style="margin-right: 0.5rem;"></i>
+                    {{ request.session.temp_tenant_name }}
                 </div>
             </div>
-            {% endif %}
+                {% endif %}
 
-            <!-- Main Content -->
-            <div class="flex-1 flex flex-col">
-                <!-- Top bar para móviles -->
-                <div class="bg-white p-4 shadow-md md:hidden flex justify-between items-center">
-                    <button class="mobile-menu-button p-2 hover:bg-blue-100 rounded focus:outline-none">
-                        <i class="fas fa-bars text-blue-800"></i>
-                    </button>
-                    <span class="font-bold text-blue-800">Parking System</span>
+            <!-- Navegación principal -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestión Principal</div>
+                    
+                    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+
+                    <a href="{% url 'vehicle-entry' %}" class="nav-item {% if request.resolver_match.url_name == 'vehicle-entry' %}active{% endif %}">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Entrada de Vehículos
+                    </a>
+
+                    <a href="{% url 'vehicle-exit' %}" class="nav-item {% if request.resolver_match.url_name == 'vehicle-exit' %}active{% endif %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Salida de Vehículos
+                    </a>
                 </div>
 
-                <!-- Content -->
-                <main class="flex-grow p-6 bg-gray-50 overflow-auto pb-16">
-                    <div class="max-w-7xl mx-auto">
+                <div class="nav-section">
+                    <div class="nav-section-title">Administración</div>
+                    
+                    <a href="{% url 'category-list' %}" class="nav-item {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-tags"></i>
+                        Categorías
+                    </a>
+
+                    <a href="{% url 'reports' %}" class="nav-item {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i>
+                        Reportes
+                    </a>
+
+                    <a href="{% url 'cash_register' %}" class="nav-item {% if 'cash' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-cash-register"></i>
+                        Caja
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Configuración</div>
+                    
+                    <a href="{% url 'company_profile' %}" class="nav-item {% if request.resolver_match.url_name == 'company_profile' %}active{% endif %}">
+                        <i class="fas fa-building"></i>
+                        Empresa
+                    </a>
+
+                    <!-- Gestión de Usuarios y Roles -->
+                    <div class="nav-section">
+                        
+                        <a href="{% url 'tenant-users-list' %}" class="nav-item {% if 'users' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-users"></i>
+                            Usuarios
+                        </a>
+                      
+                       
+                        
+                    </div>
+
+                    <!-- Selector de tema -->
+                    <div class="theme-selector" style="padding: 0 1.5rem;">
+                        <button class="theme-btn" onclick="toggleThemeDropdown()">
+                            <i class="fas fa-palette"></i>
+                            Tema
+                            <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                        </button>
+                        <div id="theme-dropdown" class="theme-dropdown">
+                            <div class="theme-option active" onclick="changeTheme('blue')">
+                                <div class="theme-color blue"></div>
+                                🌟 Indigo Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('dark')">
+                                <div class="theme-color dark"></div>
+                                🌙 Dark Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('emerald')">
+                                <div class="theme-color emerald"></div>
+                                💎 Emerald Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('purple')">
+                                <div class="theme-color purple"></div>
+                                ✨ Purple Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('indigo')">
+                                <div class="theme-color indigo"></div>
+                                🔮 Indigo Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('slate')">
+                                <div class="theme-color slate"></div>
+                                🎯 Slate Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('rose')">
+                                <div class="theme-color rose"></div>
+                                🌹 Rose Glass
+                            </div>
+                            <div class="theme-option" onclick="changeTheme('amber')">
+                                <div class="theme-color amber"></div>
+                                🏆 Amber Glass
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.is_superuser %}
+                    <a href="{% url 'exit-tenant-mode' %}" class="nav-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Salir Modo Empresa
+                    </a>
+                    {% endif %}
+                </div>
+                </nav>
+
+            <!-- Sección de usuario -->
+            <div class="sidebar-user">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h4>{{ user.username }}</h4>
+                        <p>{{ user.email }}</p>
+                    </div>
+                </div>
+                
+                <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                    <button type="submit" class="logout-btn">
+                            <i class="fas fa-power-off"></i>
+                        Cerrar Sesión
+                        </button>
+                    </form>
+            </div>
+        </aside>
+            {% endif %}
+
+        <!-- Contenido principal -->
+        <main class="admin-content">
+            <!-- Header móvil -->
+            <header class="mobile-header">
+                <div class="mobile-header-content">
+                    <button id="mobile-menu-btn" class="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="sidebar-brand">
+                        <div class="sidebar-brand-icon">
+                            <i class="fas fa-parking"></i>
+                        </div>
+                        <div class="sidebar-brand-text">
+                            <h1 style="color: #2c3e50;">SoluPark</h1>
+                        </div>
+                    </div>
+                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Contenido principal -->
+            <div class="main-content">
+                <div class="content-container">
+                    <div class="content-header">
+                        <h1 id="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                    </div>
+                    <div class="content-body">
                         {% block content %}
                         {% endblock %}
                     </div>
-                </main>
+                </div>
+            </div>
 
                 <!-- Footer -->
-                <footer class="bg-blue-800 text-white py-3 px-6">
-                    <div class="container mx-auto flex justify-between items-center text-sm">
-                        <div>
-                            <p>© 2025 Soluciones Web - Todos los derechos reservados</p>
+            <footer class="admin-footer">
+                <div class="footer-content">
+                    <div class="footer-text">
+                        © 2025 Soluciones Web - Todos los derechos reservados
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span>Contacto:</span>
-                            <a href="https://wa.me/573117098269" target="_blank" 
-                               class="hover:text-green-400 flex items-center transition duration-200">
-                                <i class="fab fa-whatsapp text-lg mr-1"></i>
-                                +57 311 709 8269
+                    <div class="footer-contact">
+                        <i class="fab fa-whatsapp"></i>
+                        <a href="https://wa.me/573117098269" target="_blank">
+                            +57 311 709 8269
                             </a>
                         </div>
                     </div>
                 </footer>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
         const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggle-sidebar');
-        const toggleIcon = document.getElementById('toggle-icon');
-        const sidebarFullElements = document.querySelectorAll('.sidebar-full');
-        const sidebarTextElements = document.querySelectorAll('.sidebar-text');
-        let isExpanded = true;
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const themeDropdown = document.getElementById('theme-dropdown');
+        const pageTitle = document.getElementById('page-title');
 
-        toggleBtn?.addEventListener('click', () => {
-            isExpanded = !isExpanded;
-            if (isExpanded) {
-                sidebar.style.width = '256px';
-                toggleIcon.classList.remove('fa-chevron-right');
-                toggleIcon.classList.add('fa-chevron-left');
-                sidebarFullElements.forEach(el => el.style.display = 'flex');
-                sidebarTextElements.forEach(el => el.style.display = 'block');
-            } else {
-                sidebar.style.width = '70px';
-                toggleIcon.classList.remove('fa-chevron-left');
-                toggleIcon.classList.add('fa-chevron-right');
-                sidebarFullElements.forEach(el => el.style.display = 'none');
-                sidebarTextElements.forEach(el => el.style.display = 'none');
+        // Funciones para móviles
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Funciones para el selector de tema
+        function toggleThemeDropdown() {
+            themeDropdown.classList.toggle('show');
+        }
+
+        function changeTheme(theme) {
+            // Remover tema activo
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // Marcar opción seleccionada como activa
+            event.target.closest('.theme-option').classList.add('active');
+            
+            // Aplicar tema
+            document.documentElement.removeAttribute('data-theme');
+            if (theme !== 'blue') {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            localStorage.setItem('theme', theme);
+            
+            // Cerrar dropdown
+            themeDropdown.classList.remove('show');
+        }
+
+        // Cargar tema guardado
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme && savedTheme !== 'blue') {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                // Actualizar estado activo en el dropdown
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.classList.remove('active');
+                    if (option.onclick.toString().includes(savedTheme)) {
+                        option.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Actualizar título de página según la URL
+        function updatePageTitle() {
+            const path = window.location.pathname;
+            const titles = {
+                '/dashboard/': 'Dashboard',
+                '/entry/': 'Registro de Ingreso',
+                '/exit/': 'Registro de Salida',
+                '/categorias/': 'Gestión de Categorías',
+                '/reports/': 'Reportes',
+                '/caja/historial/': 'Historial de Caja',
+                '/mi-empresa/': 'Perfil de Empresa',
+                '/usuarios/': 'Gestión de Usuarios'
+            };
+            
+            const title = titles[path] || 'Dashboard';
+            if (pageTitle) {
+                pageTitle.textContent = title;
+            }
+        }
+
+        // Event listeners
+        mobileMenuBtn?.addEventListener('click', openSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // Cerrar sidebar al hacer clic en un enlace (solo en móviles)
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+                // Actualizar título después de navegar
+                setTimeout(updatePageTitle, 100);
+            });
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.theme-selector')) {
+                themeDropdown.classList.remove('show');
             }
         });
+
+        // Cerrar sidebar con Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+
+        // Gestos táctiles para cerrar sidebar
+        let startX = 0;
+        let currentX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            currentX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', () => {
+            const diff = startX - currentX;
+            if (diff > 50 && sidebar.classList.contains('open')) {
+                closeSidebar();
+            }
+        });
+
+        // Manejar redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Cargar tema y título al iniciar
+        loadSavedTheme();
+        updatePageTitle();
+
+        // Actualizar título cuando cambie la URL
+        window.addEventListener('popstate', updatePageTitle);
     </script>
 </body>
 </html>
+

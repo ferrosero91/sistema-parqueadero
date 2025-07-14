@@ -1,0 +1,206 @@
+{% extends 'parking/base.html' %}
+{% load static %}
+
+{% block title %}Permisos del Rol - {{ role.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Permisos del Rol</h1>
+                    <p class="mt-2 text-gray-600">{{ role.name }} - {{ role.description|default:"Sin descripción" }}</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'roles-list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del rol -->
+        <div class="bg-white rounded-lg shadow mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Información del Rol</h3>
+            </div>
+            <div class="px-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ role.name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Estado</label>
+                        <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if role.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {% if role.is_active %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                        <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if role.is_system %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {% if role.is_system %}Sistema{% else %}Personalizado{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% if role.description %}
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Descripción</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ role.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulario de permisos -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Asignar Permisos</h3>
+                <p class="mt-1 text-sm text-gray-500">Selecciona los permisos que tendrá este rol</p>
+            </div>
+            <form method="post" class="px-6 py-4">
+                {% csrf_token %}
+                
+                <!-- Módulos y permisos -->
+                <div class="space-y-6">
+                    {% for field_name, field in form.fields.items %}
+                        {% if field_name.startswith 'module_' %}
+                            {% with module_code=field_name|slice:"7:" %}
+                                {% for perm_field_name, perm_field in form.fields.items %}
+                                    {% if perm_field_name.startswith 'perm_' and perm_field.widget.attrs.data_module == module_code %}
+                                        <div class="border border-gray-200 rounded-lg p-4">
+                                            <h4 class="text-lg font-medium text-gray-900 mb-4">
+                                                <i class="fas fa-cube mr-2"></i>
+                                                {{ perm_field.widget.attrs.data_module|title }}
+                                            </h4>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {% for perm_field_name, perm_field in form.fields.items %}
+                                                    {% if perm_field_name.startswith 'perm_' and perm_field.widget.attrs.data_module == module_code %}
+                                                        <div class="flex items-start">
+                                                            <div class="flex items-center h-5">
+                                                                {{ perm_field }}
+                                                            </div>
+                                                            <div class="ml-3 text-sm">
+                                                                <label for="{{ perm_field.id_for_label }}" class="font-medium text-gray-700">
+                                                                    {{ perm_field.label }}
+                                                                </label>
+                                                                {% if perm_field.help_text %}
+                                                                <p class="text-gray-500">{{ perm_field.help_text }}</p>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="mt-8 flex justify-end space-x-3">
+                    <a href="{% url 'roles-list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-save mr-2"></i>
+                        Guardar Permisos
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Estadísticas de permisos -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-key text-blue-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Permisos Asignados</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="assigned-permissions">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-users text-green-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Usuarios con este Rol</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ role.userrole_set.count }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-cube text-purple-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Módulos Accesibles</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="accessible-modules">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Contador de permisos seleccionados
+function updateCounters() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    let assignedCount = 0;
+    let modules = new Set();
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            assignedCount++;
+            const moduleCode = checkbox.getAttribute('data-module');
+            if (moduleCode) {
+                modules.add(moduleCode);
+            }
+        }
+    });
+    
+    document.getElementById('assigned-permissions').textContent = assignedCount;
+    document.getElementById('accessible-modules').textContent = modules.size;
+}
+
+// Actualizar contadores al cargar la página
+document.addEventListener('DOMContentLoaded', updateCounters);
+
+// Actualizar contadores cuando cambien los checkboxes
+document.addEventListener('change', function(e) {
+    if (e.target.type === 'checkbox') {
+        updateCounters();
+    }
+});
+</script>
+{% endblock %} 

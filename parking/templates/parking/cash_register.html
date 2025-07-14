@@ -6,7 +6,7 @@
     <!-- Header con título y selector de fechas -->
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Cuadre de Caja</h1>
+    
             <div class="flex items-center mt-2">
                 <p class="text-sm text-gray-600 mr-2">Período:</p>
                 <input type="text" id="date_range" class="text-sm text-gray-600 border rounded-md px-2 py-1" value="{{ start_date|date:'Y-m-d' }} - {{ end_date|date:'Y-m-d' }}">
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (selectedDates.length === 2) {
                 const start_date = selectedDates[0].toISOString().split('T')[0];
                 const end_date = selectedDates[1].toISOString().split('T')[0];
-                window.location.href = `/cash-register/?start_date=${start_date}&end_date=${end_date}`;
+                window.location.href = `{% url 'cash_register' %}?start_date=${start_date}&end_date=${end_date}`;
             }
         }
     });

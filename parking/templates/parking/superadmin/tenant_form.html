@@ -1,0 +1,266 @@
+{% extends 'parking/superadmin/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+            
+                    <p class="mt-1 text-sm text-gray-500">Completa la información de la empresa</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'superadmin-tenant-list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Volver a la Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Alerts -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="rounded-md p-4 {% if message.tags == 'success' %}bg-green-50 border border-green-200{% elif message.tags == 'error' %}bg-red-50 border border-red-200{% else %}bg-blue-50 border border-blue-200{% endif %}">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'success' %}
+                        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        {% elif message.tags == 'error' %}
+                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        {% else %}
+                        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium {% if message.tags == 'success' %}text-green-800{% elif message.tags == 'error' %}text-red-800{% else %}text-blue-800{% endif %}">
+                            {{ message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <div class="bg-white shadow rounded-lg">
+            <form method="post" class="space-y-6 p-6">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Información Básica</h3>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <!-- Name -->
+                        <div>
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.name.label }}
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Slug -->
+                        <div>
+                            <label for="{{ form.slug.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.slug.label }}
+                            </label>
+                            {{ form.slug }}
+                            {% if form.slug.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.slug.help_text }}</p>
+                            {% endif %}
+                            {% if form.slug.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.slug.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- NIT -->
+                        <div>
+                            <label for="{{ form.nit.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.nit.label }}
+                            </label>
+                            {{ form.nit }}
+                            {% if form.nit.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.nit.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.telefono.label }}
+                            </label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.telefono.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Información de Contacto</h3>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <!-- Email -->
+                        <div>
+                            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.email.label }}
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Address -->
+                        <div class="sm:col-span-2">
+                            <label for="{{ form.direccion.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.direccion.label }}
+                            </label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.direccion.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Estado de la Empresa</h3>
+                    <div class="flex items-center">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-gray-700">
+                            {{ form.is_active.label }}
+                        </label>
+                    </div>
+                    {% if form.is_active.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.is_active.help_text }}</p>
+                    {% endif %}
+                    {% if form.is_active.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.is_active.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Admin User Information -->
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Usuario Administrador</h3>
+                    <p class="text-sm text-gray-600 mb-4">Crea el usuario administrador que tendrá acceso completo a la empresa. Este usuario podrá gestionar otros usuarios, categorías, reportes y toda la configuración de la empresa.</p>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">Información importante</h3>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <p>• El administrador podrá crear usuarios adicionales (cajeros, operadores)</p>
+                                    <p>• Solo los administradores pueden gestionar usuarios de la empresa</p>
+                                    <p>• Los cajeros solo pueden gestionar entradas/salidas y caja</p>
+                                    <p>• Los operadores tienen acceso completo excepto gestión de usuarios</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <!-- Admin Username -->
+                        <div>
+                            <label for="{{ form.admin_username.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.admin_username.label }}
+                            </label>
+                            {{ form.admin_username }}
+                            {% if form.admin_username.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.admin_username.help_text }}</p>
+                            {% endif %}
+                            {% if form.admin_username.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.admin_username.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Admin Email -->
+                        <div>
+                            <label for="{{ form.admin_email.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.admin_email.label }}
+                            </label>
+                            {{ form.admin_email }}
+                            {% if form.admin_email.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.admin_email.help_text }}</p>
+                            {% endif %}
+                            {% if form.admin_email.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.admin_email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Admin Password -->
+                        <div>
+                            <label for="{{ form.admin_password.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.admin_password.label }}
+                            </label>
+                            {{ form.admin_password }}
+                            {% if form.admin_password.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.admin_password.help_text }}</p>
+                            {% endif %}
+                            {% if form.admin_password.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.admin_password.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Admin Confirm Password -->
+                        <div>
+                            <label for="{{ form.admin_confirm_password.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                {{ form.admin_confirm_password.label }}
+                            </label>
+                            {{ form.admin_confirm_password }}
+                            {% if form.admin_confirm_password.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.admin_confirm_password.help_text }}</p>
+                            {% endif %}
+                            {% if form.admin_confirm_password.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.admin_confirm_password.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                    <a href="{% url 'superadmin-tenant-list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {% if tenant %}Actualizar Empresa{% else %}Crear Empresa{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -13,7 +13,7 @@ SECRET_KEY = os.getenv(
 )
 
 # Debug
-DEBUG = False
+DEBUG = True
 
 # Hosts y CSRF - Mejorado para Coolify
 ALLOWED_HOSTS = [
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'django.contrib.humanize',
+    'widget_tweaks',
 ]
 
 # Middleware
@@ -72,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'parking.middleware.TenantMiddleware',  # Middleware para manejar tenants
+    'parking.middleware.TenantRequiredMiddleware',  # Middleware para validar acceso a tenant
 ]
 
 # URLs
@@ -98,12 +101,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'parking_system.wsgi.application'
 
 # Base de datos
-DATABASES = {
-    'default': dj_database_url.config(
-        default="postgres://postgres:s2CJ8wi4dQwA4jP38wrMOKfHPjCyz5fRkGKX7FQ9WaiTLPCsnVxCs0ipe3tAylHq@jc800wgok88ggw4kkcgckgg8:5432/postgres"
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default="postgres://postgres:s2CJ8wi4dQwA4jP38wrMOKfHPjCyz5fRkGKX7FQ9WaiTLPCsnVxCs0ipe3tAylHq@jc800wgok88ggw4kkcgckgg8:5432/postgres"
+#     )
+# }
 
+# Configuración de base de datos SQLite para desarrollo
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 # Validadores de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

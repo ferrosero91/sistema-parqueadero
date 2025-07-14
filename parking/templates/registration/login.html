@@ -1,27 +1,312 @@
-{% extends 'parking/base.html' %}
-{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Estacionamiento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .form-input {
+            @apply block w-full pl-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-xl shadow-sm transition-all duration-200;
+        }
+        .form-input:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        .input-icon {
+            @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none;
+        }
+        .input-icon i {
+            @apply text-gray-400 transition-colors duration-200;
+        }
+        .form-input:focus + .input-icon i {
+            @apply text-blue-500;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Fondo decorativo -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-10 rounded-full floating-animation"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white opacity-10 rounded-full floating-animation" style="animation-delay: -3s;"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white opacity-5 rounded-full floating-animation" style="animation-delay: -1.5s;"></div>
+        </div>
 
-{% block content %}
-<div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-    <!-- Título del sistema -->
-    <h1 class="text-3xl font-bold text-center mb-4 text-blue-800">Parking System</h1>
+        <div class="relative w-full max-w-md">
+            <!-- Logo y título -->
+            <div class="text-center mb-8">
+                <div class="mx-auto h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
+                    <i class="fas fa-parking text-3xl text-blue-600"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">
+                    {% if is_superadmin_login %}
+                        Admin Panel
+                    {% else %}
+                        Parking System
+                    {% endif %}
+                </h1>
+                <p class="text-white/80 text-lg">
+                    {% if is_superadmin_login %}
+                        Panel de Administración del Sistema
+                    {% else %}
+                        Sistema de Gestión de Parqueaderos
+                    {% endif %}
+                </p>
+            </div>
 
-    
-    
-    <!-- Formulario -->
-    <form method="post" class="space-y-4">
-        {% csrf_token %}
-        {{ form|crispy }}
+            <!-- Formulario -->
+            <div class="glass-effect rounded-2xl shadow-2xl p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        {% if is_superadmin_login %}
+                            <i class="fas fa-shield-alt text-blue-600 mr-2"></i>
+                            Acceso Administrativo
+                        {% else %}
+                            <i class="fas fa-sign-in-alt text-blue-600 mr-2"></i>
+                            Iniciar Sesión
+                        {% endif %}
+                    </h2>
+                    <p class="text-gray-600 mt-2">
+                        {% if is_superadmin_login %}
+                            Ingresa tus credenciales de administrador
+                        {% else %}
+                            Accede a tu cuenta de empresa
+                        {% endif %}
+                    </p>
+                </div>
 
-        <button type="submit" 
-                class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 focus:outline-none">
-            Iniciar Sesión
-        </button>
-    </form>
-    
-    <!-- Enlace para contraseña olvidada -->
-    <div class="mt-4 text-center">
-        <a href="{% url 'password_reset' %}" class="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
+                <form class="space-y-6" method="post">
+                    {% csrf_token %}
+                    
+                    {% if is_superadmin_login %}
+                        <!-- Formulario para superadmin -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="id_username" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-user text-blue-600 mr-2"></i>Usuario Administrador
+                                </label>
+                                <div class="relative">
+                                    {{ form.username }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                {% if form.username.errors %}
+                                    <p class="mt-1 text-sm text-red-600 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ form.username.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="id_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-lock text-blue-600 mr-2"></i>Contraseña
+                                </label>
+                                <div class="relative">
+                                    {{ form.password }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+                                {% if form.password.errors %}
+                                    <p class="mt-1 text-sm text-red-600 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ form.password.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Formulario multitenant -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="id_tenant_identifier" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-building text-blue-600 mr-2"></i>Identificador de la Empresa
+                                </label>
+                                <div class="relative">
+                                    {{ form.tenant_identifier }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                </div>
+                                {% if form.tenant_identifier.errors %}
+                                    <p class="mt-1 text-sm text-red-600 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ form.tenant_identifier.errors.0 }}
+                                    </p>
+                                {% endif %}
+                                {% if form.tenant_identifier.help_text %}
+                                    <p class="mt-1 text-sm text-gray-500 flex items-center">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        {{ form.tenant_identifier.help_text }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="id_username" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-user text-blue-600 mr-2"></i>Nombre de Usuario
+                                </label>
+                                <div class="relative">
+                                    {{ form.username }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                {% if form.username.errors %}
+                                    <p class="mt-1 text-sm text-red-600 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ form.username.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label for="id_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-lock text-blue-600 mr-2"></i>Contraseña
+                                </label>
+                                <div class="relative">
+                                    {{ form.password }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+                                {% if form.password.errors %}
+                                    <p class="mt-1 text-sm text-red-600 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>
+                                        {{ form.password.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Mensajes de error generales -->
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        Error de Autenticación
+                                    </h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <ul class="list-disc pl-5 space-y-1">
+                                            {% for error in form.non_field_errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Mensajes flash -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="rounded-md p-4 {% if message.tags == 'error' %}bg-red-50 border-l-4 border-red-400{% else %}bg-blue-50 border-l-4 border-blue-400{% endif %}">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        {% if message.tags == 'error' %}
+                                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle text-blue-400"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium {% if message.tags == 'error' %}text-red-800{% else %}text-blue-800{% endif %}">
+                                            {{ message }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Botón de envío -->
+                    <div class="pt-4">
+                        <button type="submit" class="btn-gradient w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            {% if is_superadmin_login %}
+                                Acceder al Panel
+                            {% else %}
+                                Iniciar Sesión
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Enlaces de ayuda -->
+                <div class="mt-8">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-200"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-white text-gray-500 font-medium">¿Necesitas ayuda?</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center space-y-3">
+                        <a href="{% url 'password_reset' %}" class="text-sm text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out flex items-center justify-center">
+                            <i class="fas fa-key mr-2"></i>
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                        
+                        {% if is_superadmin_login %}
+                            <div class="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-shield-alt text-blue-600 mr-1"></i>
+                                Acceso restringido solo para administradores del sistema
+                            </div>
+                        {% else %}
+                            <div class="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-info-circle text-blue-600 mr-1"></i>
+                                Contacta a tu administrador si tienes problemas para acceder
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8">
+                <p class="text-white/60 text-sm">
+                    © 2024 Parking System. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

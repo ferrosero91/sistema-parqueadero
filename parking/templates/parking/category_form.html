@@ -2,72 +2,314 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-8">
-    <!-- Encabezado del formulario -->
-    <div class="flex items-center justify-between mb-8">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">Crear Categoría</h2>
-            <p class="text-sm text-gray-600">Defina una nueva categoría de vehículo</p>
+
+                        <p class="mt-1 text-sm text-gray-500">Configure una nueva categoría con sus tarifas correspondientes</p>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'category-list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Volver a Categorías
+                    </a>
+                </div>
         </div>
-        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full">
-            <i class="fas fa-tags text-blue-600 text-lg"></i>
         </div>
     </div>
 
-    <!-- Formulario -->
-    <form method="POST" class="space-y-6">
+    <!-- Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Alerts -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="rounded-lg p-4 {% if message.tags == 'success' %}bg-green-50 border border-green-200{% elif message.tags == 'error' %}bg-red-50 border border-red-200{% else %}bg-blue-50 border border-blue-200{% endif %}">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'success' %}
+                        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        {% elif message.tags == 'error' %}
+                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        {% else %}
+                        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium {% if message.tags == 'success' %}text-green-800{% elif message.tags == 'error' %}text-red-800{% else %}text-blue-800{% endif %}">
+                            {{ message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <!-- Form Header -->
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-semibold text-white">Información de la Categoría</h3>
+                        <p class="text-blue-100 text-sm">Complete los datos de la nueva categoría de vehículo</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="px-6 py-8">
+                <form method="POST" class="space-y-8">
         {% csrf_token %}
         
-        {% for field in form %}
-        <div class="relative {% if field.name == 'monthly_rate' %}hidden monthly-rate-field{% endif %}">
-            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                {{ field.label }}
+                    <!-- Basic Information Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Información Básica
+                            </h4>
+                            
+                            <!-- Name Field -->
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-1">
+                                <div class="relative">
+                                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.name.label }}
+                                        <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        {{ form.name }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    {% if form.name.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                                    {% endif %}
+                                    {% if form.name.help_text %}
+                                    <p class="mt-2 text-sm text-gray-500">{{ form.name.help_text }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tariffs Section -->
+                        <div class="space-y-6">
+                            <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                </svg>
+                                Configuración de Tarifas
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <!-- First Hour Rate -->
+                                <div class="relative">
+                                    <label for="{{ form.first_hour_rate.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.first_hour_rate.label }}
+                                        <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        {{ form.first_hour_rate }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    {% if form.first_hour_rate.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.first_hour_rate.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Additional Hour Rate -->
+                                <div class="relative">
+                                    <label for="{{ form.additional_hour_rate.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.additional_hour_rate.label }}
+                                        <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        {{ form.additional_hour_rate }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    {% if form.additional_hour_rate.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.additional_hour_rate.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Option Section -->
+                        <div class="space-y-6">
+                            <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Opción Mensual
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <!-- Is Monthly Checkbox -->
+                                <div class="relative">
+                                    <div class="flex items-center">
+                                        <div class="flex items-center h-5">
+                                            {{ form.is_monthly }}
+                                        </div>
+                                        <div class="ml-3 text-sm">
+                                            <label for="{{ form.is_monthly.id_for_label }}" class="font-medium text-gray-700">
+                                                {{ form.is_monthly.label }}
             </label>
-            {{ field }}
-            <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
-                {% if field.label == 'Nombre' %}
-                <i class="fas fa-pen"></i>
-                {% elif field.label == 'Tarifa primera hora' %}
-                <i class="fas fa-clock"></i>
-                {% elif field.label == 'Tarifa hora adicional' %}
-                <i class="fas fa-plus"></i>
-                {% elif field.label == '¿Es mensual?' %}
-                <i class="fas fa-calendar-alt"></i>
-                {% elif field.label == 'Tarifa mensual' %}
-                <i class="fas fa-dollar-sign"></i>
+                                            <p class="text-gray-500">Habilitar tarifa mensual para esta categoría</p>
+                                        </div>
+                                    </div>
+                                    {% if form.is_monthly.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.is_monthly.errors.0 }}</p>
                 {% endif %}
             </div>
-            {% if field.errors %}
-            <p class="text-red-500 text-sm mt-2">{{ field.errors|join:", " }}</p>
+                                
+                                <!-- Monthly Rate Field -->
+                                <div class="relative monthly-rate-field hidden">
+                                    <label for="{{ form.monthly_rate.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.monthly_rate.label }}
+                                        <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        {{ form.monthly_rate }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    {% if form.monthly_rate.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ form.monthly_rate.errors.0 }}</p>
             {% endif %}
         </div>
-        {% endfor %}
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="flex space-x-4">
-            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 shadow-md flex justify-center items-center">
-                <i class="fas fa-save mr-2"></i>
-                Guardar
-            </button>
-            <a href="{% url 'category-list' %}" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg text-sm font-medium hover:bg-gray-300 text-center">
+                    <!-- Non-field errors -->
+                    {% if form.non_field_errors %}
+                    <div class="rounded-lg bg-red-50 border border-red-200 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Errores en el formulario</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Submit Buttons -->
+                    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <a href="{% url 'category-list' %}" 
+                           class="inline-flex items-center px-6 py-3 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
                 Cancelar
             </a>
+                        <button type="submit" 
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Crear Categoría
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+
+        <!-- Help Section -->
+        <div class="mt-8 bg-blue-50 rounded-lg p-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Información sobre categorías</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Las categorías permiten organizar diferentes tipos de vehículos con tarifas específicas</li>
+                            <li>La tarifa de la primera hora se cobra al ingresar el vehículo</li>
+                            <li>Las horas adicionales se calculan automáticamente al salir</li>
+                            <li>La opción mensual permite establecer una tarifa fija para usuarios frecuentes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const isMonthlyCheckbox = document.querySelector('#id_is_monthly');
     const monthlyRateField = document.querySelector('.monthly-rate-field');
+    const monthlyRateInput = document.querySelector('#id_monthly_rate');
 
-    // Mostrar u ocultar el campo "monthly_rate" según el estado de "is_monthly"
+    // Función para mostrar/ocultar el campo de tarifa mensual
     function toggleMonthlyRateField() {
         if (isMonthlyCheckbox.checked) {
             monthlyRateField.classList.remove('hidden');
+            monthlyRateField.classList.add('animate-fade-in');
+            if (monthlyRateInput) {
+                monthlyRateInput.required = true;
+            }
         } else {
             monthlyRateField.classList.add('hidden');
-            // Opcional: Limpiar el valor del campo cuando se oculta
-            document.querySelector('#id_monthly_rate').value = '';
+            if (monthlyRateInput) {
+                monthlyRateInput.value = '';
+                monthlyRateInput.required = false;
+            }
         }
     }
 
@@ -75,7 +317,56 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleMonthlyRateField();
 
     // Escuchar cambios en el checkbox
+    if (isMonthlyCheckbox) {
     isMonthlyCheckbox.addEventListener('change', toggleMonthlyRateField);
+    }
+
+    // Mejorar la experiencia de usuario con validación en tiempo real
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input[type="text"], input[type="number"]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.classList.add('border-red-300');
+                this.classList.remove('border-gray-300');
+            } else {
+                this.classList.remove('border-red-300');
+                this.classList.add('border-gray-300');
+            }
+        });
+        
+        input.addEventListener('focus', function() {
+            this.classList.remove('border-red-300');
+            this.classList.add('border-blue-500');
+        });
+    });
 });
 </script>
+
+<style>
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mejorar estilos de los campos del formulario */
+.form-input, .form-number {
+    @apply block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+
+.form-checkbox {
+    @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded;
+}
+</style>
 {% endblock %}

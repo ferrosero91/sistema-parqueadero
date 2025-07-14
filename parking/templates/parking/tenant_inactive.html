@@ -1,0 +1,113 @@
+{% extends 'parking/base.html' %}
+{% load static %}
+
+{% block title %}Empresa Inactiva{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="flex justify-center">
+            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Empresa Inactiva
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Su cuenta ha sido temporalmente suspendida
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <div class="space-y-6">
+                <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                Acceso Restringido
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>
+                                    Su empresa ha sido marcada como inactiva en el sistema. 
+                                    Esto puede deberse a:
+                                </p>
+                                <ul class="list-disc list-inside mt-2 space-y-1">
+                                    <li>Pago pendiente o vencido</li>
+                                    <li>Mantenimiento programado</li>
+                                    <li>Violación de términos de servicio</li>
+                                    <li>Problemas técnicos temporales</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">
+                                ¿Qué puede hacer?
+                            </h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Contactar al administrador del sistema</li>
+                                    <li>Verificar el estado de su cuenta</li>
+                                    <li>Revisar notificaciones por correo electrónico</li>
+                                    <li>Esperar a que se resuelva el problema</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Contacto de Soporte:</span>
+                        <span class="text-sm text-gray-900">soporte@parqueadero.com</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Teléfono:</span>
+                        <span class="text-sm text-gray-900">+57 3117098269</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Horario:</span>
+                        <span class="text-sm text-gray-900">Lun-Vie 8:00 AM - 6:00 PM</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <a href="{% url 'logout' %}" 
+                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md text-sm transition duration-150 ease-in-out">
+                        Cerrar Sesión
+                    </a>
+                    <a href="mailto:soporte@parqueadero.com?subject=Empresa Inactiva - {{ request.tenant.name }}" 
+                       class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition duration-150 ease-in-out">
+                        Contactar Soporte
+                    </a>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-xs text-gray-500">
+                        ID de Empresa: {{ request.tenant.id }} | 
+                        Nombre: {{ request.tenant.name }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
