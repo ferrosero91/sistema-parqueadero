@@ -13,7 +13,7 @@ SECRET_KEY = os.getenv(
 )
 
 # Debug
-DEBUG = True
+DEBUG = False
 
 # Hosts y CSRF - Mejorado para Coolify
 ALLOWED_HOSTS = [
