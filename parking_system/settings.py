@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'parking_system.wsgi.application'
 # Base de datos
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgres://postgres:s2CJ8wi4dQwA4jP38wrMOKfHPjCyz5fRkGKX7FQ9WaiTLPCsnVxCs0ipe3tAylHq@jc800wgok88ggw4kkcgckgg8:5432/postgres"
+        default="postgres://postgres:fFPM0mZ0UZJrc1hbkd3bV3BOe5sldS3x3rjjqBNGiNBYMAqKcos69qGl3DlEcHy0@xk0cskwsg8488c4s4ows8sws:5432/postgres"
     )
 }
 
