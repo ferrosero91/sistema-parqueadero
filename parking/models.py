@@ -214,6 +214,13 @@ class ParkingTicket(models.Model):
 # --- MODELOS MEJORADOS PARA CUADRE DE CAJA ---
 
 class CajaTurno(models.Model):
+    def diferencia_efectivo(self):
+        """
+        Devuelve la diferencia entre el efectivo contado y el esperado en efectivo.
+        """
+        if self.monto_real_contado is not None:
+            return self.monto_real_contado - self.total_esperado_efectivo()
+        return None
     ESTADO_CHOICES = [
         ("abierto", "Abierto"),
         ("cerrado", "Cerrado"),

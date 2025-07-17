@@ -6,7 +6,17 @@
     
     <form method="post" class="space-y-4">
         {% csrf_token %}
-        {{ form|crispy }}
+        {# Mostrar solo los campos básicos de la empresa, ocultando los de administración #}
+        {% for field in form.visible_fields %}
+            {% if field.name in 'name email nit telefono direccion' %}
+                <div>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}<p class="text-xs text-gray-500">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="text-xs text-red-600">{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
 
         <button type="submit" 
                 class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">

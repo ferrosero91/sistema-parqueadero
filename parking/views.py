@@ -463,10 +463,17 @@ def dashboard(request):
             'revenue': day_income
         })
     
+    # Validar si hay turno de caja abierto
+    turno_abierto = CajaTurno.objects.filter(tenant=tenant, estado='abierto').first()
+    show_apertura_alert = False
+    if not turno_abierto:
+        show_apertura_alert = True
+
     context = {
         'stats': stats,
         'daily_stats': daily_stats,
         'current_time': timezone.now(),
+        'show_apertura_alert': show_apertura_alert,
     }
     
     return render(request, 'parking/dashboard.html', context)
@@ -486,6 +493,7 @@ def print_ticket(request):
             return render(request, 'parking/print_ticket.html', {
                 'ticket': ticket,
                 'parking_lot': parking_lot,
+                'tenant': request.tenant,
                 'is_reprint': bool(request.GET.get('ticket_id')),
                 'current_time': timezone.now(),
                 'duration': ticket.get_duration() if ticket.exit_time else ticket.get_current_duration(),
@@ -685,37 +693,34 @@ class ReportView(TemplateView):
             return response
         elif export == 'pdf':
             from reportlab.lib.pagesizes import letter, landscape
-            from reportlab.pdfgen import canvas
             from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
             from django.http import HttpResponse
             import io
             buffer = io.BytesIO()
-            p = canvas.Canvas(buffer, pagesize=landscape(letter))
-            width, height = landscape(letter)
-            y = height - 40
-            p.setFont("Helvetica-Bold", 18)
-            p.setFillColor(colors.HexColor('#2563eb'))
-            p.drawString(40, y, "Reporte de Ingresos - Parqueadero")
-            p.setFillColor(colors.black)
-            y -= 30
-            p.setFont("Helvetica", 11)
-            p.drawString(40, y, f"Fecha de generación: {timezone.localtime(now()).strftime('%d/%m/%Y %H:%M')}")
-            y -= 20
-            p.setFont("Helvetica-Bold", 11)
-            p.drawString(40, y, f"Rango: {context['start_date']} a {context['end_date']}")
-            y -= 18
-            p.setStrokeColor(colors.HexColor('#2563eb'))
-            p.setLineWidth(1)
-            p.line(40, y, width-40, y)
-            y -= 12
-            p.setFont("Helvetica-Bold", 10)
-            p.drawString(40, y, "Fecha")
-            p.drawString(140, y, "Placa")
-            p.drawString(220, y, "Categoría")
-            p.drawString(340, y, "Monto")
-            p.drawString(420, y, "Forma de Pago")
-            y -= 16
-            p.setFont("Helvetica", 9)
+            doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), leftMargin=30, rightMargin=30, topMargin=30, bottomMargin=30)
+            elements = []
+            styles = getSampleStyleSheet()
+            # Título premium
+            title_style = ParagraphStyle('title', parent=styles['Title'], fontSize=22, textColor=colors.HexColor('#2563eb'), alignment=TA_CENTER, spaceAfter=12)
+            subtitle_style = ParagraphStyle('subtitle', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#64748b'), alignment=TA_CENTER, spaceAfter=8)
+            info_style = ParagraphStyle('info', parent=styles['Normal'], fontSize=10, textColor=colors.HexColor('#334155'), alignment=TA_LEFT, spaceAfter=8)
+            # Logo (opcional, si tienes uno en static)
+            # elements.append(Image('static/logo.png', width=60, height=60))
+            elements.append(Paragraph("Reporte de Ingresos - Parqueadero", title_style))
+            elements.append(Paragraph(f"Fecha de generación: <b>{timezone.localtime(now()).strftime('%d/%m/%Y %H:%M')}</b>", subtitle_style))
+            elements.append(Paragraph(f"Rango: <b>{context['start_date']} a {context['end_date']}</b>", subtitle_style))
+            elements.append(Spacer(1, 10))
+            # Tabla de ingresos
+            table_data = [[
+                Paragraph('<b>Fecha</b>', styles['Normal']),
+                Paragraph('<b>Placa</b>', styles['Normal']),
+                Paragraph('<b>Categoría</b>', styles['Normal']),
+                Paragraph('<b>Monto</b>', styles['Normal']),
+                Paragraph('<b>Forma de Pago</b>', styles['Normal']),
+            ]]
             total = 0
             pagos = {f['clave']: 0 for f in context['formas_pago_list']}
             for ticket in ParkingTicket.objects.filter(
@@ -728,40 +733,69 @@ class ReportView(TemplateView):
                     forma_pago = 'efectivo'
                 pagos[forma_pago] += ticket.amount_paid
                 total += ticket.amount_paid
-                if y < 60:
-                    p.showPage()
-                    y = height - 40
-                p.drawString(40, y, ticket.exit_time.strftime('%d/%m/%Y %H:%M'))
-                p.drawString(140, y, ticket.placa)
-                p.drawString(220, y, ticket.category.name if ticket.category else '')
-                p.drawString(340, y, f"${ticket.amount_paid:,.2f}")
-                p.drawString(420, y, dict(CajaMovimiento.FORMA_PAGO_CHOICES).get(forma_pago, forma_pago.title()))
-                y -= 14
-            # Línea separadora
-            y -= 6
-            p.setStrokeColor(colors.HexColor('#2563eb'))
-            p.setLineWidth(1)
-            p.line(40, y, width-40, y)
-            y -= 18
-            # Sumatoria total
-            p.setFont("Helvetica-Bold", 12)
-            p.setFillColor(colors.HexColor('#16a34a'))
-            p.drawString(40, y, f"TOTAL INGRESOS: ${total:,.2f}")
-            p.setFillColor(colors.black)
-            y -= 24
-            # Desglose por forma de pago
-            p.setFont("Helvetica-Bold", 11)
-            p.drawString(40, y, "Desglose por Medio de Pago:")
-            y -= 16
-            p.setFont("Helvetica", 10)
+                table_data.append([
+                    ticket.exit_time.strftime('%d/%m/%Y %H:%M'),
+                    ticket.placa,
+                    ticket.category.name if ticket.category else '',
+                    Paragraph(f"<para alignment='right'><b>${ticket.amount_paid:,.2f}</b></para>", styles['Normal']),
+                    Paragraph(f"<para alignment='center'>{dict(CajaMovimiento.FORMA_PAGO_CHOICES).get(forma_pago, forma_pago.title())}</para>", styles['Normal']),
+                ])
+            col_widths = [90, 80, 100, 90, 120]
+            t = Table(table_data, colWidths=col_widths, repeatRows=1)
+            t.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+                ('ALIGN', (0,0), (2,-1), 'CENTER'),
+                ('ALIGN', (3,1), (3,-1), 'RIGHT'),
+                ('ALIGN', (4,1), (4,-1), 'CENTER'),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0,0), (-1,0), 11),
+                ('FONTSIZE', (0,1), (-1,-1), 10),
+                ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.whitesmoke, colors.HexColor('#f1f5f9')]),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('BOTTOMPADDING', (0,0), (-1,0), 8),
+                ('TOPPADDING', (0,0), (-1,0), 8),
+            ]))
+            elements.append(t)
+            elements.append(Spacer(1, 16))
+            # Layout profesional: desglose y total alineados horizontalmente
+            total_style = ParagraphStyle('total', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#16a34a'), alignment=TA_RIGHT, spaceAfter=0)
+            desglose_style = ParagraphStyle('desglose', parent=styles['Heading3'], fontSize=13, textColor=colors.HexColor('#2563eb'), alignment=TA_LEFT, spaceAfter=6)
+            desglose_data = [[Paragraph('<b>Medio de Pago</b>', styles['Normal']), Paragraph('<b>Monto</b>', styles['Normal'])]]
             for f in context['formas_pago_list']:
-                p.setFillColor(colors.HexColor('#2563eb'))
-                p.drawString(60, y, f"{f['nombre']}: ")
-                p.setFillColor(colors.HexColor('#16a34a'))
-                p.drawString(180, y, f"${pagos[f['clave']]:,.2f}")
-                p.setFillColor(colors.black)
-                y -= 14
-            p.save()
+                desglose_data.append([
+                    Paragraph(f["nombre"], styles['Normal']),
+                    Paragraph(f"<para alignment='right'><b>${pagos[f['clave']]:,.2f}</b></para>", styles['Normal'])
+                ])
+            desglose_table = Table(desglose_data, colWidths=[140, 100])
+            desglose_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#f1f5f9')),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0,0), (-1,0), 11),
+                ('FONTSIZE', (0,1), (-1,-1), 10),
+                ('ALIGN', (0,0), (0,-1), 'LEFT'),
+                ('ALIGN', (1,1), (1,-1), 'RIGHT'),
+                ('GRID', (0,0), (-1,-1), 0.25, colors.HexColor('#cbd5e1')),
+                ('BOTTOMPADDING', (0,0), (-1,0), 6),
+                ('TOPPADDING', (0,0), (-1,0), 6),
+            ]))
+            # Tabla de layout horizontal
+            layout_table = Table([
+                [Paragraph("Desglose por Medio de Pago:", desglose_style), Paragraph(f"TOTAL INGRESOS: <b>${total:,.2f}</b>", total_style)],
+                [desglose_table, ""]
+            ], colWidths=[260, 260])
+            layout_table.setStyle(TableStyle([
+                ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                ('ALIGN', (1,0), (1,0), 'RIGHT'),
+                ('SPAN', (1,1), (1,1)),
+                ('LEFTPADDING', (0,0), (-1,-1), 0),
+                ('RIGHTPADDING', (0,0), (-1,-1), 0),
+                ('TOPPADDING', (0,0), (-1,-1), 0),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+            ]))
+            elements.append(layout_table)
+            doc.build(elements)
             buffer.seek(0)
             return HttpResponse(buffer, content_type='application/pdf')
         return super().render_to_response(context, **response_kwargs)
@@ -771,16 +805,18 @@ class ReportView(TemplateView):
 @tenant_required
 @admin_required
 def company_profile(request):
-    parking_lot = ParkingLot.objects.filter(tenant=request.tenant).first()
+    tenant = request.tenant
+
+    from .forms import TenantEditForm
 
     if request.method == 'POST':
-        form = ParkingLotForm(request.POST, instance=parking_lot)
+        form = TenantEditForm(request.POST, instance=tenant)
         if form.is_valid():
             form.save()
             messages.success(request, 'Información de la empresa actualizada correctamente.')
             return redirect('company_profile')
     else:
-        form = ParkingLotForm(instance=parking_lot)
+        form = TenantEditForm(instance=tenant)
 
     return render(request, 'parking/company_profile.html', {'form': form})
 
@@ -1233,11 +1269,12 @@ def cierre_turno(request):
     else:
         form = CajaTurnoCierreForm(instance=turno)
     resumen = {
+        'dinero_inicial_en_caja': turno.monto_inicial,  # Dinero inicial en caja
         'total_ingresos': turno.total_ingresos(),
         'total_egresos': turno.total_egresos(),
         'total_esperado': turno.total_esperado(),
         'total_esperado_efectivo': turno.total_esperado_efectivo(),
-        'diferencia': turno.diferencia(),
+        'diferencia': turno.diferencia_efectivo(),
         'alerta': turno.alerta_diferencia(),
         'desglose_forma_pago': turno.desglose_ingresos_por_forma_pago(),
     }
@@ -1285,96 +1322,127 @@ def historial_cuadre_caja(request):
             if not hasattr(request, 'tenant') or not request.tenant:
                 return JsonResponse({'error': 'No tienes una empresa asignada.'}, status=400)
             
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+            from reportlab.lib.styles import getSampleStyleSheet
             buffer = io.BytesIO()
-            p = canvas.Canvas(buffer, pagesize=landscape(letter))
-            width, height = landscape(letter)
-            y = height - 40
-            
-            # Título del documento
-            p.setFont("Helvetica-Bold", 18)
-            p.setFillColor(colors.HexColor('#2563eb'))
-            p.drawString(40, y, "Historial de Cuadre de Caja")
-            p.setFillColor(colors.black)
-            y -= 30
-            
-            # Información de generación
-            p.setFont("Helvetica", 10)
-            p.drawString(40, y, f"Fecha de generación: {timezone.now().strftime('%d/%m/%Y %H:%M')}")
-            y -= 20
-            p.drawString(40, y, f"Empresa: {request.tenant.name}")
-            y -= 20
-            p.drawString(40, y, f"Usuario: {request.user.username}")
-            y -= 20
-            
-            # Línea separadora
-            p.setStrokeColor(colors.HexColor('#2563eb'))
-            p.setLineWidth(1)
-            p.line(40, y, width-40, y)
-            y -= 20
-            
-            # Encabezados de tabla
-            p.setFont("Helvetica-Bold", 10)
-            p.drawString(40, y, "Apertura")
-            p.drawString(120, y, "Cierre")
-            p.drawString(200, y, "Usuario Apertura")
-            p.drawString(300, y, "Usuario Cierre")
-            p.drawString(400, y, "Ingresos")
-            p.drawString(470, y, "Egresos")
-            p.drawString(540, y, "Esperado")
-            p.drawString(610, y, "Contado")
-            p.drawString(680, y, "Diferencia")
-            p.drawString(750, y, "Estado")
-            y -= 18
-            
-            # Datos de turnos
-            p.setFont("Helvetica", 9)
+            doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), leftMargin=30, rightMargin=30, topMargin=30, bottomMargin=30)
+            elements = []
+            styles = getSampleStyleSheet()
+            title = Paragraph("<b>Historial de Cuadre de Caja</b>", styles['Title'])
+            elements.append(title)
+            elements.append(Spacer(1, 8))
+            info = Paragraph(f"<b>Fecha de generación:</b> {timezone.now().strftime('%d/%m/%Y %H:%M')}<br/><b>Empresa:</b> {request.tenant.name}<br/><b>Usuario:</b> {request.user.username}", styles['Normal'])
+            elements.append(info)
+            elements.append(Spacer(1, 8))
+
+            # Tabla principal
+            headers = [
+                "Apertura", "Cierre", "Usr. Ap.", "Usr. Ci.", "Inicial", "Efec.", "Dat.", "Trans.", "Egr.", "Esp. Efec.", "Contado", "Dif.", "Estado"
+            ]
+            data = [headers]
             for turno in turnos:
-                if y < 60:
-                    p.showPage()
-                    y = height - 40
-                
-                p.drawString(40, y, turno.fecha_apertura.strftime('%d/%m/%Y %H:%M'))
-                p.drawString(120, y, turno.fecha_cierre.strftime('%d/%m/%Y %H:%M') if turno.fecha_cierre else '-')
-                p.drawString(200, y, getattr(turno.usuario_apertura, 'username', '-'))
-                p.drawString(300, y, getattr(turno.usuario_cierre, 'username', '-') if turno.usuario_cierre else '-')
-                p.drawString(400, y, f"${turno.total_ingresos():,.2f}")
-                p.drawString(470, y, f"${turno.total_egresos():,.2f}")
-                p.drawString(540, y, f"${turno.total_esperado():,.2f}")
-                p.drawString(610, y, f"${turno.monto_real_contado:,.2f}" if turno.monto_real_contado else '-')
-                p.drawString(680, y, f"${turno.diferencia():,.2f}" if turno.diferencia() is not None else '-')
-                p.drawString(750, y, turno.get_estado_display())
-                y -= 16
-                
+                ingresos_por_forma = turno.desglose_ingresos_por_forma_pago()
+                data.append([
+                    turno.fecha_apertura.strftime('%d/%m/%y %H:%M'),
+                    turno.fecha_cierre.strftime('%d/%m/%y %H:%M') if turno.fecha_cierre else '-',
+                    getattr(turno.usuario_apertura, 'username', '-')[:10],
+                    getattr(turno.usuario_cierre, 'username', '-')[:10] if turno.usuario_cierre else '-',
+                    f"${turno.monto_inicial:,.2f}",
+                    f"${ingresos_por_forma.get('efectivo', 0):,.2f}",
+                    f"${ingresos_por_forma.get('datafono', 0):,.2f}",
+                    f"${ingresos_por_forma.get('transferencia', 0):,.2f}",
+                    f"${turno.total_egresos():,.2f}",
+                    f"${turno.total_esperado_efectivo():,.2f}",
+                    f"${turno.monto_real_contado:,.2f}" if turno.monto_real_contado else '-',
+                    f"${turno.diferencia_efectivo():,.2f}" if turno.diferencia_efectivo() is not None else '-',
+                    turno.get_estado_display(),
+                ])
+
+            col_widths = [60, 60, 55, 55, 50, 50, 50, 50, 50, 60, 60, 50, 50]
+            t = Table(data, colWidths=col_widths, repeatRows=1)
+            t.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0,0), (-1,0), 8),
+                ('FONTSIZE', (0,1), (-1,-1), 7),
+                ('BOTTOMPADDING', (0,0), (-1,0), 6),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ]))
+            elements.append(t)
+            elements.append(Spacer(1, 12))
+
+            # Resumen final discriminado por tipo de pago
+            if turnos:
+                total_inicial = sum(t.monto_inicial for t in turnos)
+                total_efectivo = sum(t.desglose_ingresos_por_forma_pago().get('efectivo', 0) for t in turnos)
+                total_datafono = sum(t.desglose_ingresos_por_forma_pago().get('datafono', 0) for t in turnos)
+                total_transferencia = sum(t.desglose_ingresos_por_forma_pago().get('transferencia', 0) for t in turnos)
+                total_egresos = sum(t.total_egresos() for t in turnos)
+                resumen_data = [
+                    ["Total Inicial", f"${total_inicial:,.2f}"],
+                    ["Total Efectivo", f"${total_efectivo:,.2f}"],
+                    ["Total Datafono", f"${total_datafono:,.2f}"],
+                    ["Total Transferencia", f"${total_transferencia:,.2f}"],
+                    ["Total Egresos", f"${total_egresos:,.2f}"],
+                    ["Balance Neto", f"${(total_inicial + total_efectivo + total_datafono + total_transferencia) - total_egresos:,.2f}"],
+                ]
+                resumen_table = Table(resumen_data, colWidths=[120, 100])
+                resumen_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#f1f5f9')),
+                    ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+                    ('FONTSIZE', (0,0), (-1,-1), 9),
+                    ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+                    ('GRID', (0,0), (-1,-1), 0.25, colors.grey),
+                ]))
+                elements.append(resumen_table)
+
+            doc.build(elements)
+            buffer.seek(0)
+            response = HttpResponse(buffer, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="historial_cuadre_caja_{timezone.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+            return response
+
                 # Detalle de movimientos
-                p.setFont("Helvetica-Oblique", 8)
-                for mov in turno.movimientos.all():
-                    if y < 60:
-                        p.showPage()
-                        y = height - 40
-                    p.drawString(60, y, f"{mov.fecha.strftime('%d/%m/%Y %H:%M')} | {mov.get_tipo_display()} | {mov.get_categoria_display()} | ${mov.monto:,.2f} | {mov.get_forma_pago_display()} | {mov.usuario.username}")
-                    y -= 12
-                p.setFont("Helvetica", 9)
             
-            # Resumen final
+            # Resumen final discriminado por tipo de pago
             if turnos:
                 y -= 20
                 p.setStrokeColor(colors.HexColor('#2563eb'))
                 p.setLineWidth(1)
                 p.line(40, y, width-40, y)
                 y -= 20
-                
-                total_ingresos = sum(t.total_ingresos() for t in turnos)
+
+                total_inicial = sum(t.monto_inicial for t in turnos)
+                total_efectivo = sum(t.desglose_ingresos_por_forma_pago().get('efectivo', 0) for t in turnos)
+                total_datafono = sum(t.desglose_ingresos_por_forma_pago().get('datafono', 0) for t in turnos)
+                total_transferencia = sum(t.desglose_ingresos_por_forma_pago().get('transferencia', 0) for t in turnos)
+                total_otro = sum(t.desglose_ingresos_por_forma_pago().get('otro', 0) for t in turnos)
                 total_egresos = sum(t.total_egresos() for t in turnos)
-                
+
                 p.setFont("Helvetica-Bold", 12)
+                p.setFillColor(colors.HexColor('#2563eb'))
+                p.drawString(40, y, f"TOTAL DINERO INICIAL: ${total_inicial:,.2f}")
+                y -= 16
                 p.setFillColor(colors.HexColor('#16a34a'))
-                p.drawString(40, y, f"TOTAL INGRESOS: ${total_ingresos:,.2f}")
+                p.drawString(40, y, f"TOTAL INGRESOS EFECTIVO: ${total_efectivo:,.2f}")
+                y -= 16
+                p.setFillColor(colors.HexColor('#0ea5e9'))
+                p.drawString(40, y, f"TOTAL INGRESOS DATAFONO: ${total_datafono:,.2f}")
+                y -= 16
+                p.setFillColor(colors.HexColor('#a21caf'))
+                p.drawString(40, y, f"TOTAL INGRESOS TRANSFERENCIA: ${total_transferencia:,.2f}")
+                y -= 16
+                p.setFillColor(colors.HexColor('#f59e42'))
+                p.drawString(40, y, f"TOTAL INGRESOS OTRO: ${total_otro:,.2f}")
                 y -= 16
                 p.setFillColor(colors.HexColor('#dc2626'))
                 p.drawString(40, y, f"TOTAL EGRESOS: ${total_egresos:,.2f}")
                 y -= 16
                 p.setFillColor(colors.HexColor('#2563eb'))
-                p.drawString(40, y, f"BALANCE NETO: ${total_ingresos - total_egresos:,.2f}")
+                p.drawString(40, y, f"BALANCE NETO: ${(total_inicial + total_efectivo + total_datafono + total_transferencia + total_otro) - total_egresos:,.2f}")
             
             p.save()
             buffer.seek(0)
@@ -1385,6 +1453,13 @@ def historial_cuadre_caja(request):
             
         except Exception as e:
             return JsonResponse({'error': f'Error al generar PDF: {str(e)}'}, status=500)
+    # Calcular y asignar esperado_efectivo y diferencia como en el PDF
+    for t in turnos:
+        t.esperado_efectivo = t.total_esperado_efectivo()  # Solo efectivo: inicial + ingresos efectivo - egresos efectivo
+        if t.monto_real_contado is not None:
+            t.diferencia = t.monto_real_contado - t.total_esperado_efectivo()
+        else:
+            t.diferencia = None
     return render(request, 'parking/caja/historial_cuadre_caja.html', {'turnos': turnos})
 
 # --- VISTAS PARA GESTIÓN DE ROLES Y PERMISOS ---

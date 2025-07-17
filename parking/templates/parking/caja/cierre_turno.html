@@ -49,6 +49,10 @@
                         <span class="font-semibold text-gray-800">{{ turno.fecha_apertura|date:'d/m/Y H:i' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Dinero inicial en caja:</span>
+                        <span class="font-bold text-blue-700">${{ resumen.dinero_inicial_en_caja }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
                         <span class="text-gray-600">Ingresos:</span>
                         <span class="font-bold text-green-600">${{ resumen.total_ingresos }}</span>
                     </div>

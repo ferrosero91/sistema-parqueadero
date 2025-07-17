@@ -100,20 +100,22 @@ TEMPLATES = [
 # WSGI
 WSGI_APPLICATION = 'parking_system.wsgi.application'
 
-# Base de datos
+# # Base de datos
 DATABASES = {
     'default': dj_database_url.config(
         default="postgres://postgres:fFPM0mZ0UZJrc1hbkd3bV3BOe5sldS3x3rjjqBNGiNBYMAqKcos69qGl3DlEcHy0@xk0cskwsg8488c4s4ows8sws:5432/postgres"
     )
 }
 
-# Configuración de base de datos SQLite para desarrollo
+#Configuración de base de datos SQLite para desarrollo
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+
 # Validadores de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

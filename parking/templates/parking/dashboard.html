@@ -2,6 +2,16 @@
 {% load humanize %}
 
 {% block content %}
+    {% if show_apertura_alert %}
+    <div class="mb-4 p-4 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 flex items-center">
+        <i class="fas fa-exclamation-triangle text-yellow-500 mr-3 text-xl"></i>
+        <div>
+            <span class="font-semibold text-yellow-800">No hay un turno de caja abierto.</span><br>
+            <span class="text-yellow-700 text-sm">Debes abrir un turno de caja para poder operar el sistema.</span>
+            <a href="{% url 'apertura_turno' %}" class="ml-4 inline-block px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-semibold text-xs">Abrir Turno</a>
+        </div>
+    </div>
+    {% endif %}
 <div class="p-4 md:p-6 space-y-4 md:space-y-6">
     <!-- Header con título y fecha -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 space-y-2 sm:space-y-0">
