@@ -21,6 +21,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '192.168.1.128',
     '192.168.1.128:3001',
+    '173.212.208.35',
+    '173.212.208.35:3001',
     'parqueadero.sufactura.store',
     '*.sufactura.store',
     '*',
@@ -103,7 +105,7 @@ WSGI_APPLICATION = 'parking_system.wsgi.application'
 # # Base de datos
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgres://postgres:fFPM0mZ0UZJrc1hbkd3bV3BOe5sldS3x3rjjqBNGiNBYMAqKcos69qGl3DlEcHy0@xk0cskwsg8488c4s4ows8sws:5432/postgres"
+        default="postgres://postgres:DNM5GFM2Ohe64dU9q7lOxOwc35HxDJkgt7QpcPXKVf8IiYI7033UVkSDTXp9Cvjv@x4cg08ooggc08ws4owowcso8:5432/postgres"
     )
 }
 
