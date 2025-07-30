@@ -1,63 +1,431 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Estacionamiento</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+
         .glass-effect {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         .input-focus:focus {
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
         .btn-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: all 0.3s ease;
         }
+
         .btn-gradient:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
+
         .floating-animation {
             animation: float 6s ease-in-out infinite;
         }
+
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
+
         .form-input {
             @apply block w-full pl-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-xl shadow-sm transition-all duration-200;
         }
+
         .form-input:focus {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
         }
+
         .input-icon {
             @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none;
         }
+
         .input-icon i {
             @apply text-gray-400 transition-colors duration-200;
         }
-        .form-input:focus + .input-icon i {
+
+        .form-input:focus+.input-icon i {
             @apply text-blue-500;
+        }
+
+        /* Estilos premium para inputs del superadmin */
+        .admin-input-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .admin-icon-wrapper {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .admin-input-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 18px 20px 18px 60px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1f2937;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .admin-input::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+
+        .admin-input:focus {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow:
+                0 12px 40px rgba(102, 126, 234, 0.2),
+                0 0 0 4px rgba(102, 126, 234, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .admin-input:focus+.admin-input-icon {
+            color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .admin-input:focus~.admin-input-border {
+            transform: scaleX(1);
+        }
+
+        .admin-input-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .admin-input-border {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0 0 16px 16px;
+        }
+
+        .admin-error-message {
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            color: #dc2626;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Animaciones adicionales para el superadmin */
+        .admin-input-group:hover .admin-icon-wrapper {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .admin-input-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .admin-input:focus~.admin-input-container::before,
+        .admin-input-container:hover::before {
+            opacity: 1;
+        }
+
+        /* Efectos de partículas para el superadmin */
+        @keyframes adminGlow {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            }
+
+            50% {
+                box-shadow:
+                    0 8px 32px rgba(102, 126, 234, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .admin-input:not(:focus) {
+            animation: adminGlow 4s ease-in-out infinite;
+        }
+
+        /* Botón premium para superadmin */
+        .admin-submit-btn {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 25%, #581c87 50%, #7c2d12 75%, #dc2626 100%);
+            background-size: 300% 300%;
+            animation: adminButtonGradient 6s ease infinite;
+            box-shadow:
+                0 12px 40px rgba(30, 58, 138, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            transform: perspective(1000px) rotateX(0deg);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .admin-submit-btn:hover {
+            transform: perspective(1000px) rotateX(-5deg) translateY(-4px);
+            box-shadow:
+                0 20px 60px rgba(30, 58, 138, 0.6),
+                0 0 0 2px rgba(255, 255, 255, 0.2),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+            animation-duration: 3s;
+        }
+
+        .admin-submit-btn:active {
+            transform: perspective(1000px) rotateX(-2deg) translateY(-1px);
+            transition-duration: 0.1s;
+        }
+
+        .admin-btn-content {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-btn-glow {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .admin-submit-btn:hover .admin-btn-glow {
+            left: 100%;
+        }
+
+        @keyframes adminButtonGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Efectos adicionales para el botón del superadmin */
+        .admin-submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .admin-submit-btn:hover::before {
+            opacity: 1;
+        }
+
+        .admin-submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .admin-submit-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Sección de ayuda premium para superadmin */
+        .admin-help-box {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.05) 0%, rgba(88, 28, 135, 0.05) 100%);
+            border: 1px solid rgba(30, 58, 138, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-help-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #581c87 50%, #dc2626 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .admin-help-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #581c87 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 24px rgba(30, 58, 138, 0.3);
+        }
+
+        .admin-help-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-help-text {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .admin-help-features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .admin-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 11px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .admin-feature i {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 8px;
+        }
+
+        /* Animación sutil para la caja de ayuda */
+        .admin-help-box {
+            animation: adminHelpGlow 6s ease-in-out infinite;
+        }
+
+        @keyframes adminHelpGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 16px rgba(30, 58, 138, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15);
+            }
         }
     </style>
 </head>
+
 <body class="gradient-bg min-h-screen">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <!-- Fondo decorativo -->
         <div class="absolute inset-0 overflow-hidden">
             <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-10 rounded-full floating-animation"></div>
-            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white opacity-10 rounded-full floating-animation" style="animation-delay: -3s;"></div>
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white opacity-5 rounded-full floating-animation" style="animation-delay: -1.5s;"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white opacity-10 rounded-full floating-animation"
+                style="animation-delay: -3s;"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white opacity-5 rounded-full floating-animation"
+                style="animation-delay: -1.5s;"></div>
         </div>
 
         <div class="relative w-full max-w-md">
@@ -68,16 +436,16 @@
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">
                     {% if is_superadmin_login %}
-                        Admin Panel
+                    Admin Panel
                     {% else %}
-                        Parking System
+                    Parking System
                     {% endif %}
                 </h1>
                 <p class="text-white/80 text-lg">
                     {% if is_superadmin_login %}
-                        Panel de Administración del Sistema
+                    Panel de Administración del Sistema
                     {% else %}
-                        Sistema de Gestión de Parqueaderos
+                    Sistema de Gestión de Parqueaderos
                     {% endif %}
                 </p>
             </div>
@@ -87,184 +455,185 @@
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">
                         {% if is_superadmin_login %}
-                            <i class="fas fa-shield-alt text-blue-600 mr-2"></i>
-                            Acceso Administrativo
+                        <i class="fas fa-shield-alt text-blue-600 mr-2"></i>
+                        Acceso Administrativo
                         {% else %}
-                            <i class="fas fa-sign-in-alt text-blue-600 mr-2"></i>
-                            Iniciar Sesión
+                        <i class="fas fa-sign-in-alt text-blue-600 mr-2"></i>
+                        Iniciar Sesión
                         {% endif %}
                     </h2>
                     <p class="text-gray-600 mt-2">
                         {% if is_superadmin_login %}
-                            Ingresa tus credenciales de administrador
+                        Ingresa tus credenciales de administrador
                         {% else %}
-                            Accede a tu cuenta de empresa
+                        Ingresa tu correo y contraseña
                         {% endif %}
                     </p>
                 </div>
 
                 <form class="space-y-6" method="post">
                     {% csrf_token %}
-                    
+
                     {% if is_superadmin_login %}
-                        <!-- Formulario para superadmin -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="id_username" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-user text-blue-600 mr-2"></i>Usuario Administrador
-                                </label>
-                                <div class="relative">
-                                    {{ form.username }}
-                                    <div class="input-icon">
-                                        <i class="fas fa-user"></i>
+                    <!-- Formulario para superadmin -->
+                    <div class="space-y-6">
+                        <div class="admin-input-group">
+                            <label for="id_username" class="block text-sm font-bold text-gray-800 mb-3 tracking-wide">
+                                <div class="flex items-center">
+                                    <div class="admin-icon-wrapper">
+                                        <i class="fas fa-user-shield"></i>
                                     </div>
+                                    <span class="ml-3">Usuario Administrador</span>
                                 </div>
-                                {% if form.username.errors %}
-                                    <p class="mt-1 text-sm text-red-600 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        {{ form.username.errors.0 }}
-                                    </p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="id_password" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-lock text-blue-600 mr-2"></i>Contraseña
-                                </label>
-                                <div class="relative">
-                                    {{ form.password }}
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
+                            </label>
+                            <div class="relative admin-input-container">
+                                <input type="text" name="username" id="id_username" required class="admin-input"
+                                    placeholder="Ingrese su usuario de administrador" autocomplete="username">
+                                <div class="admin-input-icon">
+                                    <i class="fas fa-user-shield"></i>
                                 </div>
-                                {% if form.password.errors %}
-                                    <p class="mt-1 text-sm text-red-600 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        {{ form.password.errors.0 }}
-                                    </p>
-                                {% endif %}
+                                <div class="admin-input-border"></div>
                             </div>
+                            {% if form.username.errors %}
+                            <div class="admin-error-message">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
                         </div>
+
+                        <div class="admin-input-group">
+                            <label for="id_password" class="block text-sm font-bold text-gray-800 mb-3 tracking-wide">
+                                <div class="flex items-center">
+                                    <div class="admin-icon-wrapper">
+                                        <i class="fas fa-key"></i>
+                                    </div>
+                                    <span class="ml-3">Contraseña de Administrador</span>
+                                </div>
+                            </label>
+                            <div class="relative admin-input-container">
+                                <input type="password" name="password" id="id_password" required class="admin-input"
+                                    placeholder="Ingrese su contraseña de administrador"
+                                    autocomplete="current-password">
+                                <div class="admin-input-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div class="admin-input-border"></div>
+                            </div>
+                            {% if form.password.errors %}
+                            <div class="admin-error-message">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                {{ form.password.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% else %}
-                        <!-- Formulario multitenant -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="id_tenant_identifier" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-building text-blue-600 mr-2"></i>Identificador de la Empresa
-                                </label>
-                                <div class="relative">
-                                    {{ form.tenant_identifier }}
-                                    <div class="input-icon">
-                                        <i class="fas fa-building"></i>
-                                    </div>
+                    <!-- Formulario multitenant -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="id_username" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-envelope text-blue-600 mr-2"></i>Correo Electrónico
+                            </label>
+                            <div class="relative">
+                                {{ form.username }}
+                                <div class="input-icon">
+                                    <i class="fas fa-envelope"></i>
                                 </div>
-                                {% if form.tenant_identifier.errors %}
-                                    <p class="mt-1 text-sm text-red-600 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        {{ form.tenant_identifier.errors.0 }}
-                                    </p>
-                                {% endif %}
-                                {% if form.tenant_identifier.help_text %}
-                                    <p class="mt-1 text-sm text-gray-500 flex items-center">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        {{ form.tenant_identifier.help_text }}
-                                    </p>
-                                {% endif %}
                             </div>
-
-                            <div>
-                                <label for="id_username" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-user text-blue-600 mr-2"></i>Nombre de Usuario
-                                </label>
-                                <div class="relative">
-                                    {{ form.username }}
-                                    <div class="input-icon">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                </div>
-                                {% if form.username.errors %}
-                                    <p class="mt-1 text-sm text-red-600 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        {{ form.username.errors.0 }}
-                                    </p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="id_password" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-lock text-blue-600 mr-2"></i>Contraseña
-                                </label>
-                                <div class="relative">
-                                    {{ form.password }}
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                </div>
-                                {% if form.password.errors %}
-                                    <p class="mt-1 text-sm text-red-600 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        {{ form.password.errors.0 }}
-                                    </p>
-                                {% endif %}
-                            </div>
+                            {% if form.username.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ form.username.errors.0 }}
+                            </p>
+                            {% endif %}
                         </div>
+
+                        <div>
+                            <label for="id_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-lock text-blue-600 mr-2"></i>Contraseña
+                            </label>
+                            <div class="relative">
+                                {{ form.password }}
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                            </div>
+                            {% if form.password.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ form.password.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endif %}
 
                     <!-- Mensajes de error generales -->
                     {% if form.non_field_errors %}
-                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-exclamation-triangle text-red-400"></i>
-                                </div>
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">
-                                        Error de Autenticación
-                                    </h3>
-                                    <div class="mt-2 text-sm text-red-700">
-                                        <ul class="list-disc pl-5 space-y-1">
-                                            {% for error in form.non_field_errors %}
-                                                <li>{{ error }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">
+                                    Error de Autenticación
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                    </div>
                     {% endif %}
 
                     <!-- Mensajes flash -->
                     {% if messages %}
-                        {% for message in messages %}
-                            <div class="rounded-md p-4 {% if message.tags == 'error' %}bg-red-50 border-l-4 border-red-400{% else %}bg-blue-50 border-l-4 border-blue-400{% endif %}">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        {% if message.tags == 'error' %}
-                                            <i class="fas fa-exclamation-triangle text-red-400"></i>
-                                        {% else %}
-                                            <i class="fas fa-info-circle text-blue-400"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium {% if message.tags == 'error' %}text-red-800{% else %}text-blue-800{% endif %}">
-                                            {{ message }}
-                                        </p>
-                                    </div>
-                                </div>
+                    {% for message in messages %}
+                    <div
+                        class="rounded-md p-4 {% if message.tags == 'error' %}bg-red-50 border-l-4 border-red-400{% else %}bg-blue-50 border-l-4 border-blue-400{% endif %}">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                {% else %}
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                                {% endif %}
                             </div>
-                        {% endfor %}
+                            <div class="ml-3">
+                                <p
+                                    class="text-sm font-medium {% if message.tags == 'error' %}text-red-800{% else %}text-blue-800{% endif %}">
+                                    {{ message }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                     {% endif %}
 
                     <!-- Botón de envío -->
-                    <div class="pt-4">
-                        <button type="submit" class="btn-gradient w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
-                            <i class="fas fa-sign-in-alt mr-2"></i>
-                            {% if is_superadmin_login %}
-                                Acceder al Panel
-                            {% else %}
-                                Iniciar Sesión
-                            {% endif %}
+                    <div class="pt-6">
+                        {% if is_superadmin_login %}
+                        <button type="submit"
+                            class="admin-submit-btn w-full flex justify-center items-center py-4 px-6 border border-transparent text-base font-bold rounded-2xl text-white focus:outline-none transition-all duration-500 relative overflow-hidden">
+                            <div class="admin-btn-content flex items-center relative z-10">
+                                <i class="fas fa-shield-alt mr-3 text-lg"></i>
+                                <span class="tracking-wide">ACCEDER AL PANEL ADMINISTRATIVO</span>
+                            </div>
+                            <div class="admin-btn-glow"></div>
                         </button>
+                        {% else %}
+                        <button type="submit"
+                            class="btn-gradient w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            Iniciar Sesión
+                        </button>
+                        {% endif %}
                     </div>
                 </form>
 
@@ -280,21 +649,44 @@
                     </div>
 
                     <div class="mt-6 text-center space-y-3">
-                        <a href="{% url 'password_reset' %}" class="text-sm text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out flex items-center justify-center">
+                        <a href="{% url 'password_reset' %}"
+                            class="text-sm text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out flex items-center justify-center">
                             <i class="fas fa-key mr-2"></i>
                             ¿Olvidaste tu contraseña?
                         </a>
-                        
+
                         {% if is_superadmin_login %}
-                            <div class="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg">
-                                <i class="fas fa-shield-alt text-blue-600 mr-1"></i>
-                                Acceso restringido solo para administradores del sistema
+                        <div class="admin-help-box">
+                            <div class="admin-help-icon">
+                                <i class="fas fa-shield-alt"></i>
                             </div>
+                            <div class="admin-help-content">
+                                <h4 class="admin-help-title">Panel de Administración del Sistema</h4>
+                                <p class="admin-help-text">Acceso restringido exclusivamente para administradores del
+                                    sistema. Este panel permite gestionar todas las empresas y configuraciones globales.
+                                </p>
+                                <div class="admin-help-features">
+                                    <div class="admin-feature">
+                                        <i class="fas fa-building"></i>
+                                        <span>Gestión de Empresas</span>
+                                    </div>
+                                    <div class="admin-feature">
+                                        <i class="fas fa-users-cog"></i>
+                                        <span>Control de Usuarios</span>
+                                    </div>
+                                    <div class="admin-feature">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span>Reportes Globales</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {% else %}
-                            <div class="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg">
-                                <i class="fas fa-info-circle text-blue-600 mr-1"></i>
-                                Contacta a tu administrador si tienes problemas para acceder
-                            </div>
+                        <div class="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-info-circle text-blue-600 mr-1"></i>
+                            Usa tu correo electrónico y contraseña para acceder. Contacta a tu administrador si tienes
+                            problemas.
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -309,4 +701,5 @@
         </div>
     </div>
 </body>
+
 </html>

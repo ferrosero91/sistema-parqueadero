@@ -83,7 +83,7 @@ class CustomLoginView(LoginView):
         if 'superadmin' in next_url or self.request.GET.get('superadmin') == 'true':
             messages.error(self.request, "Credenciales inválidas.")
         else:
-            messages.error(self.request, "Error en las credenciales. Verifique el identificador de la empresa, usuario y contraseña.")
+            messages.error(self.request, "Error en las credenciales. Verifique su correo electrónico y contraseña.")
         
         return super().form_invalid(form)
     
@@ -132,7 +132,7 @@ class ParkingLotUpdateView(UpdateView):
 @method_decorator(admin_required, name='dispatch')
 class CategoryListView(ListView):
     model = VehicleCategory
-    template_name = 'parking/category_list.html'
+    template_name = 'parking/category_list_simple.html'
 
     def get_queryset(self):
         return VehicleCategory.objects.filter(tenant=self.request.tenant)

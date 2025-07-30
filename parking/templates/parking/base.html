@@ -612,6 +612,69 @@
                 gap: 1rem;
             }
         }
+
+        /* Clases de utilidad responsive adicionales */
+        .card-mobile {
+            transition: transform 0.2s ease;
+        }
+        
+        .card-mobile:hover {
+            transform: translateY(-2px);
+        }
+        
+        .table-mobile {
+            font-size: 0.875rem;
+        }
+        
+        .btn-mobile {
+            min-height: 44px; /* Tamaño mínimo para touch */
+            touch-action: manipulation;
+        }
+        
+        .input-mobile {
+            min-height: 44px; /* Tamaño mínimo para touch */
+            font-size: 16px; /* Previene zoom en iOS */
+        }
+        
+        @media (max-width: 640px) {
+            .table-mobile {
+                font-size: 0.75rem;
+            }
+            
+            .card-mobile {
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Ocultar columnas menos importantes en móviles */
+            .hide-mobile {
+                display: none;
+            }
+            
+            /* Hacer botones más grandes en móviles */
+            .btn-mobile {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            /* Mejorar espaciado en móviles */
+            .space-mobile > * + * {
+                margin-top: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .text-responsive {
+                font-size: 0.875rem;
+            }
+            
+            .heading-responsive {
+                font-size: 1.25rem;
+            }
+            
+            .padding-mobile {
+                padding: 0.75rem;
+            }
+        }
         
         /* Overlay para móviles */
         .sidebar-overlay {

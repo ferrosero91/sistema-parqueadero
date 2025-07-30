@@ -6,24 +6,13 @@ from .models import VehicleCategory, ParkingTicket, Tenant, UserProfile, Parking
 
 class TenantLoginForm(AuthenticationForm):
     """
-    Formulario de login personalizado que incluye el identificador de la empresa
+    Formulario de login personalizado que usa email y contraseña
     """
-    tenant_identifier = forms.CharField(
-        max_length=100,
-        label="Identificador de la empresa",
-        widget=forms.TextInput(attrs={
+    username = forms.EmailField(
+        label="Correo Electrónico",
+        widget=forms.EmailInput(attrs={
             'class': 'form-input block w-full pl-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md shadow-sm',
-            'placeholder': 'Ej: parqueadero-la-23'
-        }),
-        help_text="Ingrese el identificador único de su empresa"
-    )
-    
-    username = forms.CharField(
-        max_length=150,
-        label="Usuario",
-        widget=forms.TextInput(attrs={
-            'class': 'form-input block w-full pl-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md shadow-sm',
-            'placeholder': 'Ingrese su usuario'
+            'placeholder': 'Ingrese su correo electrónico'
         })
     )
     
@@ -36,42 +25,39 @@ class TenantLoginForm(AuthenticationForm):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
-        tenant_identifier = cleaned_data.get('tenant_identifier')
-        username = cleaned_data.get('username')
-        password = cleaned_data.get('password')
+        email = self.cleaned_data.get('username')  # El campo se llama username pero contiene el email
+        password = self.cleaned_data.get('password')
 
-        if tenant_identifier and username and password:
+        if email and password:
             try:
-                # Buscar el tenant por el identificador
-                tenant = Tenant.objects.get(slug=tenant_identifier, is_active=True)
+                # Buscar el usuario por email
+                user_profile = UserProfile.objects.select_related('user', 'tenant').get(
+                    user__email=email,
+                    is_active=True,
+                    tenant__is_active=True
+                )
+                user = user_profile.user
+                tenant = user_profile.tenant
                 
-                # Buscar el usuario que pertenezca a este tenant
-                try:
-                    user_profile = UserProfile.objects.get(
-                        user__username=username,
-                        tenant=tenant,
-                        is_active=True
-                    )
-                    user = user_profile.user
-                    
-                    # Verificar la contraseña
-                    if not user.check_password(password):
-                        raise forms.ValidationError("Credenciales inválidas")
-                    
-                    # Agregar el tenant y user al cleaned_data
-                    cleaned_data['tenant'] = tenant
-                    cleaned_data['user'] = user
-                    
-                except UserProfile.DoesNotExist:
-                    raise forms.ValidationError("Usuario no encontrado en esta empresa")
-                    
-            except Tenant.DoesNotExist:
-                raise forms.ValidationError("Empresa no encontrada o inactiva")
-            except Tenant.MultipleObjectsReturned:
-                raise forms.ValidationError("Error en el identificador de la empresa")
+                # Verificar la contraseña
+                if not user.check_password(password):
+                    raise self.get_invalid_login_error()
+                
+                # Confirmar que el usuario está activo
+                self.confirm_login_allowed(user)
+                
+                # Agregar el tenant y user al cleaned_data
+                self.cleaned_data['tenant'] = tenant
+                self.cleaned_data['user'] = user
+                
+                return self.cleaned_data
+                
+            except UserProfile.DoesNotExist:
+                raise self.get_invalid_login_error()
+            except UserProfile.MultipleObjectsReturned:
+                raise forms.ValidationError("Error: Múltiples usuarios encontrados con este correo")
 
-        return cleaned_data
+        return self.cleaned_data
 
 
 class CategoryForm(forms.ModelForm):
@@ -330,10 +316,10 @@ class TenantUserForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        tenant = self.instance.tenant
-        if email and tenant:
-            if UserProfile.objects.filter(user__email=email, tenant=tenant).exists():
-                raise forms.ValidationError("Este email ya está registrado en esta empresa.")
+        if email:
+            # Verificar que el email sea único globalmente (no solo por tenant)
+            if UserProfile.objects.filter(user__email=email).exists():
+                raise forms.ValidationError("Este email ya está registrado en el sistema.")
         return email
 
     def clean(self):
@@ -479,6 +465,14 @@ class TenantUserEditForm(forms.ModelForm):
             ).exclude(user=self.instance.user).exists():
                 raise forms.ValidationError("Este nombre de usuario ya existe en esta empresa")
         return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and self.instance and self.instance.user:
+            # Verificar que el email sea único globalmente (excluyendo el usuario actual)
+            if UserProfile.objects.filter(user__email=email).exclude(user=self.instance.user).exists():
+                raise forms.ValidationError("Este email ya está registrado en el sistema.")
+        return email
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -632,14 +626,10 @@ class TenantCreateForm(forms.ModelForm):
 
     def clean_admin_email(self):
         email = self.cleaned_data.get('admin_email')
-        slug = self.cleaned_data.get('slug')
-        if email and slug:
-            try:
-                tenant = Tenant.objects.get(slug=slug)
-            except Tenant.DoesNotExist:
-                tenant = None
-            if tenant and UserProfile.objects.filter(user__email=email, tenant=tenant).exists():
-                raise forms.ValidationError("Este email ya está registrado en esta empresa.")
+        if email:
+            # Verificar que el email sea único globalmente
+            if UserProfile.objects.filter(user__email=email).exists():
+                raise forms.ValidationError("Este email ya está registrado en el sistema.")
         return email
 
     def clean(self):

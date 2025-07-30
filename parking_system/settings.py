@@ -95,6 +95,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'debug': DEBUG,
         },
     },
 ]
@@ -109,7 +110,7 @@ DATABASES = {
     )
 }
 
-#Configuración de base de datos SQLite para desarrollo
+# Configuración de base de datos SQLite para desarrollo
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
