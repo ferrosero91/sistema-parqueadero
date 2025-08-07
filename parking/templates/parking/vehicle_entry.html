@@ -3,147 +3,197 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4 md:py-6">
-                <div class="flex items-center space-x-3 md:space-x-4">
+    <!-- Header Responsivo -->
+    <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+            <div class="flex justify-between items-center py-3 sm:py-4 lg:py-6">
+                <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
                     <div
-                        class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                        class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl shadow-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="text-lg md:text-xl font-bold text-gray-900">Entrada de vehiculos</h1>
-                        <p 
+                    <div class="min-w-0 flex-1">
+                        <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">Entrada de
+                            Vehículos</h1>
+                        <p class="text-xs sm:text-sm text-gray-500 hidden sm:block">Registrar nuevo ingreso</p>
+                    </div>
                 </div>
-                <div class="flex space-x-2 md:space-x-3">
+                <div class="flex-shrink-0">
                     <a href="{% url 'dashboard' %}"
-                        class="inline-flex items-center px-3 md:px-4 py-2 border border-gray-300 text-xs md:text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
-                        <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="inline-flex items-center px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 border border-gray-300 text-xs sm:text-sm font-medium rounded-md sm:rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 shadow-sm">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Volver
+                        <span class="hidden xs:inline">Volver</span>
+                        <span class="xs:hidden">←</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Content -->
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <!-- Form Card -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <!-- Form Header -->
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 md:px-6 py-3 md:py-4">
+    <!-- Contenido Principal Responsivo -->
+    <div class="w-full max-w-2xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6">
+        <!-- Tarjeta del Formulario -->
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <!-- Encabezado del Formulario -->
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm md:text-lg font-semibold text-white">Información del Vehículo</h3>
-                        
+                    <div class="ml-2 sm:ml-3">
+                        <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-white">Información del Vehículo
+                        </h3>
+                        <p class="text-xs sm:text-sm text-blue-100 opacity-90 hidden sm:block">Complete los datos
+                            requeridos</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Form Content -->
-            <div class="px-4 md:px-6 py-4 md:py-8">
-                <form method="post" class="space-y-4 md:space-y-6" id="entry-form" autocomplete="off">
+            <!-- Contenido del Formulario -->
+            <div class="px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+                <form method="post" class="space-y-3 sm:space-y-4 lg:space-y-5" id="entry-form" autocomplete="off">
                     {% csrf_token %}
 
-                    <!-- Categoría -->
-                    <div class="form-group p-3 md:p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                            Categoría <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <select name="category" id="id_category" required
-                                class="form-select block w-full pl-10 py-2 md:py-3 text-sm md:text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md shadow-sm input-mobile">
-                                <option value="">Seleccione una categoría</option>
-                                {% for choice in form.category.field.choices %}
-                                {% if choice.0 != '' and choice.1 != '--------' %}
-                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                {% endif %}
-                                {% endfor %}
-                            </select>
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-tags text-gray-400"></i>
+                    <!-- Campo Categoría -->
+                    <div class="form-group">
+                        <div
+                            class="p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-white transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                                <span class="flex items-center">
+                                    <i class="fas fa-tags text-blue-500 mr-2"></i>
+                                    Categoría
+                                    <span class="text-red-500 ml-1">*</span>
+                                </span>
+                            </label>
+                            <div class="relative">
+                                <select name="category" id="id_category" required
+                                    class="form-select block w-full pl-10 pr-4 py-3 sm:py-3.5 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg shadow-sm bg-white transition-all duration-200 hover:border-gray-400">
+                                    <option value="">Seleccione una categoría</option>
+                                    {% for choice in form.category.field.choices %}
+                                    {% if choice.0 != '' and choice.1 != '--------' %}
+                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-tags text-gray-400"></i>
+                                </div>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Placa -->
-                    <div class="form-group p-3 md:p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                            Placa <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            {{ form.placa }}
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-car text-gray-400"></i>
+                    <!-- Campo Placa -->
+                    <div class="form-group">
+                        <div
+                            class="p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-white transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                                <span class="flex items-center">
+                                    <i class="fas fa-car text-blue-500 mr-2"></i>
+                                    Placa
+                                    <span class="text-red-500 ml-1">*</span>
+                                </span>
+                            </label>
+                            <div class="relative">
+                                {{ form.placa }}
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-car text-gray-400"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Color (opcional) -->
-                    <div class="form-group p-3 md:p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                            Color <span class="text-gray-400">(opcional)</span>
-                        </label>
-                        <div class="relative">
-                            {{ form.color }}
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-palette text-gray-400"></i>
+                    <!-- Campos Opcionales en Grid Responsivo -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <!-- Campo Color -->
+                        <div class="form-group">
+                            <div
+                                class="p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-white transition-colors duration-200 shadow-sm hover:shadow-md">
+                                <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-palette text-green-500 mr-2"></i>
+                                        Color
+                                        <span class="text-gray-400 text-xs ml-1">(opcional)</span>
+                                    </span>
+                                </label>
+                                <div class="relative">
+                                    {{ form.color }}
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-palette text-gray-400"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Marca (opcional) -->
-                    <div class="form-group p-3 md:p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                            Marca <span class="text-gray-400">(opcional)</span>
-                        </label>
-                        <div class="relative">
-                            {{ form.marca }}
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-tag text-gray-400"></i>
+                        <!-- Campo Marca -->
+                        <div class="form-group">
+                            <div
+                                class="p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-white transition-colors duration-200 shadow-sm hover:shadow-md">
+                                <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-tag text-purple-500 mr-2"></i>
+                                        Marca
+                                        <span class="text-gray-400 text-xs ml-1">(opcional)</span>
+                                    </span>
+                                </label>
+                                <div class="relative">
+                                    {{ form.marca }}
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-tag text-gray-400"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Campo de Cascos (inicialmente oculto) -->
-                    <div id="cascos-field"
-                        class="form-group p-3 md:p-4 border border-gray-200 rounded-lg bg-white shadow-sm hidden">
-                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                            Número de Cascos <span class="text-red-500 cascos-required hidden">*</span>
-                        </label>
-                        <div class="relative">
-                            {{ form.cascos }}
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-helmet-safety text-gray-400"></i>
+                    <div id="cascos-field" class="form-group hidden">
+                        <div
+                            class="p-3 sm:p-4 border-2 border-orange-200 rounded-lg bg-orange-50/50 hover:bg-orange-50 transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                                <span class="flex items-center">
+                                    <i class="fas fa-helmet-safety text-orange-500 mr-2"></i>
+                                    Número de Cascos
+                                    <span class="text-red-500 cascos-required hidden ml-1">*</span>
+                                </span>
+                            </label>
+                            <div class="relative">
+                                {{ form.cascos }}
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-helmet-safety text-gray-400"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="pt-4 md:pt-6">
+                    <!-- Botón de Envío -->
+                    <div class="pt-4 sm:pt-6">
                         <button type="submit"
-                            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 md:py-4 px-4 md:px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 flex items-center justify-center shadow-lg btn-mobile">
-                            <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor"
+                            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 sm:py-4 px-4 sm:px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center shadow-lg font-medium text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                            <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            <span class="text-sm md:text-base font-medium">Registrar Ingreso</span>
+                            <span class="submit-text">Registrar Ingreso</span>
                         </button>
                     </div>
                 </form>
@@ -160,19 +210,36 @@
         const cascosInput = form.querySelector('#id_cascos');
         const cascosRequired = document.querySelector('.cascos-required');
 
-        // Función para mostrar/ocultar el campo de cascos
+        // Función mejorada para mostrar/ocultar el campo de cascos
         function toggleCascosField() {
             const selectedOption = categorySelect.options[categorySelect.selectedIndex];
             const categoryName = selectedOption.text.toUpperCase();
 
-            if (categoryName.includes('MOTOS')) {
+            if (categoryName.includes('MOTOS') || categoryName.includes('MOTO')) {
+                // Mostrar campo con animación
                 cascosField.classList.remove('hidden');
+                cascosField.classList.add('show');
                 cascosRequired.classList.remove('hidden');
                 cascosInput.setAttribute('required', '');
+                cascosInput.value = '1'; // Valor por defecto
+
+                // Scroll suave al campo si está fuera de vista
+                setTimeout(() => {
+                    const rect = cascosField.getBoundingClientRect();
+                    if (rect.bottom > window.innerHeight) {
+                        cascosField.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                }, 100);
             } else {
+                // Ocultar campo
                 cascosField.classList.add('hidden');
+                cascosField.classList.remove('show');
                 cascosRequired.classList.add('hidden');
                 cascosInput.removeAttribute('required');
+                cascosInput.value = '';
             }
         }
 
@@ -182,23 +249,100 @@
         // Ejecutar una vez al cargar
         toggleCascosField();
 
-        // Convertir inputs a mayúsculas
+        // Convertir inputs a mayúsculas y validaciones en tiempo real
         form.querySelectorAll('input[type="text"]').forEach(input => {
             input.addEventListener('input', function () {
                 this.value = this.value.toUpperCase();
+
+                // Remover borde de error si el campo ahora tiene valor
+                if (this.value.trim()) {
+                    this.classList.remove('border-red-500');
+                }
+            });
+
+            // Validación al perder el foco
+            input.addEventListener('blur', function () {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('border-red-500');
+                } else {
+                    this.classList.remove('border-red-500');
+                }
             });
         });
 
-        // Validación del formulario
+        // Validación para select
+        categorySelect.addEventListener('change', function () {
+            if (this.value) {
+                this.classList.remove('border-red-500');
+            }
+        });
+
+        // Mejorar experiencia en móviles
+        if ('ontouchstart' in window) {
+            // Prevenir zoom en inputs en iOS
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            }
+
+            // Mejorar scroll en móviles
+            document.body.style.overscrollBehavior = 'contain';
+        }
+
+        // Atajos de teclado
+        document.addEventListener('keydown', function (e) {
+            // Ctrl/Cmd + Enter para enviar formulario
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                form.dispatchEvent(new Event('submit'));
+            }
+
+            // Escape para limpiar formulario
+            if (e.key === 'Escape') {
+                if (confirm('¿Desea limpiar el formulario?')) {
+                    form.reset();
+                    toggleCascosField();
+                    categorySelect.focus();
+                }
+            }
+        });
+
+        // Validación mejorada del formulario
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const submitButton = form.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
+            const submitText = submitButton.querySelector('.submit-text');
+            const originalText = submitText.textContent;
 
-            // Deshabilitar botón
+            // Validar campos requeridos
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                    field.focus();
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+
+            if (!isValid) {
+                showNotification('Por favor complete todos los campos requeridos', 'error');
+                return;
+            }
+
+            // Estado de carga
             submitButton.disabled = true;
-            submitButton.innerHTML = '<svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><span class="text-sm md:text-base font-medium">Registrando...</span>';
+            document.body.classList.add('loading');
+            submitButton.innerHTML = `
+                <svg class="w-5 h-5 mr-3 animate-spin flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span class="submit-text">Registrando...</span>
+            `;
 
             try {
                 const formData = new FormData(form);
@@ -213,29 +357,284 @@
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
+                        // Mostrar éxito
+                        showNotification('¡Vehículo registrado exitosamente!', 'success');
+
                         // Abrir ticket
                         window.open(result.redirect_url, '_blank');
 
-                        // Mostrar mensaje y recargar
-                        alert('¡Vehículo registrado exitosamente!\n\nEl ticket se abrió en una nueva pestaña.\nLa página se recargará automáticamente.');
-
-                        // Recargar página
-                        window.location.reload();
+                        // Limpiar formulario después de un delay
+                        setTimeout(() => {
+                            form.reset();
+                            toggleCascosField();
+                            showNotification('Formulario listo para un nuevo registro', 'info');
+                        }, 2000);
                     } else {
-                        alert('Error: ' + (result.error || 'Error al registrar el vehículo'));
+                        showNotification('Error: ' + (result.error || 'Error al registrar el vehículo'), 'error');
                     }
                 } else {
-                    alert('Error al procesar la solicitud');
+                    showNotification('Error al procesar la solicitud', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión');
+                showNotification('Error de conexión. Verifique su internet.', 'error');
             } finally {
                 // Rehabilitar botón
                 submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
+                document.body.classList.remove('loading');
+                submitButton.innerHTML = `
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span class="submit-text">${originalText}</span>
+                `;
             }
         });
+
+        // Sistema de notificaciones mejorado
+        function showNotification(message, type = 'info') {
+            // Remover notificación existente
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = `notification fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                info: 'bg-blue-500 text-white',
+                warning: 'bg-yellow-500 text-black'
+            };
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                info: 'ℹ',
+                warning: '⚠'
+            };
+
+            notification.className += ` ${colors[type]}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span class="text-lg mr-2">${icons[type]}</span>
+                    <span class="text-sm font-medium">${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Animar entrada
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Auto-remover
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
     });
 </script>
+
+<style>
+    /* Estilos base para inputs */
+    input[type="text"],
+    input[type="number"],
+    select {
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem !important;
+        font-size: 16px !important;
+        /* Previene zoom en iOS */
+        min-height: 48px !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #d1d5db !important;
+        background-color: white !important;
+        transition: all 0.2s ease-in-out !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+        outline: none !important;
+        ring: 2px !important;
+        ring-color: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    /* Breakpoint para pantallas extra pequeñas */
+    @media (max-width: 375px) {
+        .max-w-2xl {
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
+
+        .px-3 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+
+        .rounded-lg,
+        .rounded-xl {
+            border-radius: 0.5rem !important;
+        }
+
+        .form-group>div {
+            padding: 0.75rem !important;
+        }
+
+        .text-base {
+            font-size: 0.875rem !important;
+        }
+    }
+
+    /* Breakpoint para móviles */
+    @media (max-width: 640px) {
+        .max-w-2xl {
+            max-width: 96% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        /* Grid responsivo para campos opcionales */
+        .grid-cols-1.sm\\:grid-cols-2 {
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+        }
+
+        /* Espaciado optimizado */
+        .space-y-3>*+* {
+            margin-top: 0.75rem !important;
+        }
+
+        /* Botón optimizado para móvil */
+        button[type="submit"] {
+            padding: 1rem !important;
+            font-size: 1rem !important;
+            min-height: 56px !important;
+            border-radius: 0.75rem !important;
+        }
+
+        /* Header sticky optimizado */
+        .sticky {
+            position: -webkit-sticky !important;
+            position: sticky !important;
+        }
+
+        /* Mejorar legibilidad en móviles */
+        label {
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+        }
+
+        /* Iconos más pequeños en móvil */
+        .fas {
+            font-size: 0.875rem !important;
+        }
+    }
+
+    /* Breakpoint para tablets */
+    @media (min-width: 641px) and (max-width: 1024px) {
+        .max-w-2xl {
+            max-width: 90% !important;
+        }
+
+        /* Grid de 2 columnas para campos opcionales */
+        .grid-cols-1.sm\\:grid-cols-2 {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 1rem !important;
+        }
+    }
+
+    /* Breakpoint para desktop */
+    @media (min-width: 1025px) {
+        .max-w-2xl {
+            max-width: 42rem !important;
+        }
+
+        /* Hover effects solo en desktop */
+        .form-group>div:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-1px) scale(1.02) !important;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3) !important;
+        }
+    }
+
+    /* Animaciones suaves */
+    .form-group>div {
+        transition: all 0.2s ease-in-out !important;
+    }
+
+    /* Estados de loading */
+    .loading input,
+    .loading select,
+    .loading button {
+        pointer-events: none !important;
+        opacity: 0.7 !important;
+    }
+
+    /* Mejoras de accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* Focus visible mejorado */
+    input:focus-visible,
+    select:focus-visible,
+    button:focus-visible {
+        outline: 2px solid #3b82f6 !important;
+        outline-offset: 2px !important;
+    }
+
+    /* Estilos para el campo de cascos cuando está visible */
+    #cascos-field.show {
+        animation: slideDown 0.3s ease-out !important;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Indicador de campo requerido */
+    .text-red-500 {
+        color: #ef4444 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Mejoras para select en móviles */
+    select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-image: none !important;
+    }
+
+    /* Estilos para pantallas de alta densidad */
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+    }
+</style>
+
 {% endblock %}
