@@ -1,0 +1,23 @@
+{% if company_logo %}
+    {% if size == 'small' %}
+        <img src="{{ company_logo }}" alt="Logo" class="h-8 w-auto object-contain">
+    {% elif size == 'large' %}
+        <img src="{{ company_logo }}" alt="Logo" class="h-16 w-auto object-contain">
+    {% else %}
+        <img src="{{ company_logo }}" alt="Logo" class="h-12 w-auto object-contain">
+    {% endif %}
+{% else %}
+    {% if size == 'small' %}
+        <div class="h-8 w-8 bg-gray-200 rounded flex items-center justify-center">
+            <i class="fas fa-parking text-gray-500"></i>
+        </div>
+    {% elif size == 'large' %}
+        <div class="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
+            <i class="fas fa-parking text-gray-500 text-2xl"></i>
+        </div>
+    {% else %}
+        <div class="h-12 w-12 bg-gray-200 rounded flex items-center justify-center">
+            <i class="fas fa-parking text-gray-500 text-lg"></i>
+        </div>
+    {% endif %}
+{% endif %}

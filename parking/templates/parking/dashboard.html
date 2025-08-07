@@ -1,251 +1,318 @@
 {% extends 'parking/base.html' %}
 {% load humanize %}
+{% load parking_tags %}
+
+{% block page_title %}<i class="fas fa-tachometer-alt mr-3"></i>Dashboard Principal{% endblock %}
 
 {% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Subtitle -->
+    <div class="mb-8">
+        <p class="text-gray-600">Resumen general del sistema de estacionamiento - {{ current_time|date:"l, d F Y" }}</p>
+    </div>
+    <!-- Alerta de turno de caja -->
     {% if show_apertura_alert %}
-    <div class="mb-4 p-4 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 flex items-center">
-        <i class="fas fa-exclamation-triangle text-yellow-500 mr-3 text-xl"></i>
-        <div>
-            <span class="font-semibold text-yellow-800">No hay un turno de caja abierto.</span><br>
-            <span class="text-yellow-700 text-sm">Debes abrir un turno de caja para poder operar el sistema.</span>
-            <a href="{% url 'apertura_turno' %}" class="ml-4 inline-block px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-semibold text-xs">Abrir Turno</a>
+    <div class="mb-6">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-lg font-medium text-yellow-800">No hay un turno de caja abierto</h3>
+                    <p class="mt-1 text-sm text-yellow-700">
+                        Debes abrir un turno de caja para poder operar el sistema correctamente.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{% url 'apertura_turno' %}" class="btn btn-primary">
+                            <i class="fas fa-cash-register mr-2"></i>Abrir Turno de Caja
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     {% endif %}
-<div class="p-4 md:p-6 space-y-4 md:space-y-6">
-    <!-- Header con título y fecha -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 space-y-2 sm:space-y-0">
-        <div>
-    
-            <p class="text-xs md:text-sm text-gray-600">{{ current_time|date:"l, d F Y" }}</p>
-        </div>
-        <div class="flex space-x-2 md:space-x-3">
-            <button onclick="reloadDashboard()" class="inline-flex items-center px-3 py-2 border border-transparent text-xs md:text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all">
-                <i class="fas fa-sync-alt mr-1 md:mr-2"></i>
-                <span class="hidden sm:inline">Actualizar</span>
-                <span class="sm:hidden">Refrescar</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- Tarjetas KPI -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
+
+
+    <!-- Cards de resumen -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Vehículos Totales -->
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg p-4 md:p-6 transform transition-all duration-300 hover:scale-105 card-mobile">
-            <div class="flex items-center justify-between">
-                <div class="flex-1 min-w-0">
-                    <div class="text-xs md:text-sm font-medium opacity-80">Vehículos Totales</div>
-                    <div class="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{{ stats.daily.total_vehicles|default:0 }}</div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-car text-blue-600 text-xl"></i>
+                    </div>
                 </div>
-                <div class="bg-white/20 p-2 md:p-3 rounded-lg flex-shrink-0">
-                    <i class="fas fa-car text-lg md:text-2xl"></i>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ stats.daily.total_vehicles|default:0 }}</h3>
+                    <p class="text-sm text-gray-600">Vehículos Totales</p>
+                    <p class="text-xs text-gray-500">Últimos 7 días</p>
                 </div>
             </div>
-            <p class="text-xs md:text-sm mt-3 md:mt-4 opacity-80">Completados (últimos 7 días)</p>
         </div>
 
         <!-- Ingresos Totales -->
-        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl shadow-lg p-4 md:p-6 transform transition-all duration-300 hover:scale-105 card-mobile">
-            <div class="flex items-center justify-between">
-                <div class="flex-1 min-w-0">
-                    <div class="text-xs md:text-sm font-medium opacity-80">Ingresos Totales</div>
-                    <div class="text-2xl md:text-3xl font-bold mt-1 md:mt-2">${{ stats.daily.total_revenue|default:0|floatformat:2|intcomma }}</div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                    </div>
                 </div>
-                <div class="bg-white/20 p-2 md:p-3 rounded-lg flex-shrink-0">
-                    <i class="fas fa-dollar-sign text-lg md:text-2xl"></i>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ stats.daily.total_income|default:0|format_currency:request.tenant }}</h3>
+                    <p class="text-sm text-gray-600">Ingresos Totales</p>
+                    <p class="text-xs text-gray-500">Hoy</p>
                 </div>
             </div>
-            <p class="text-xs md:text-sm mt-3 md:mt-4 opacity-80">Generados (últimos 7 días)</p>
         </div>
 
         <!-- Vehículos Activos -->
-        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-xl shadow-lg p-4 md:p-6 transform transition-all duration-300 hover:scale-105 card-mobile">
-            <div class="flex items-center justify-between">
-                <div class="flex-1 min-w-0">
-                    <div class="text-xs md:text-sm font-medium opacity-80">Vehículos Activos</div>
-                    <div class="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{{ stats.active_vehicles }}</div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-parking text-yellow-600 text-xl"></i>
+                    </div>
                 </div>
-                <div class="bg-white/20 p-2 md:p-3 rounded-lg flex-shrink-0">
-                    <i class="fas fa-parking text-lg md:text-2xl"></i>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ active_vehicles_count|default:0 }}</h3>
+                    <p class="text-sm text-gray-600">Vehículos Activos</p>
+                    <p class="text-xs text-gray-500">En el parqueadero</p>
                 </div>
             </div>
-            <p class="text-xs md:text-sm mt-3 md:mt-4 opacity-80">Actualmente en el estacionamiento</p>
+        </div>
+
+        <!-- Espacios Disponibles -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-square text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ available_spaces|default:"N/A" }}</h3>
+                    <p class="text-sm text-gray-600">Espacios Disponibles</p>
+                    <p class="text-xs text-gray-500">Libres</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Registrar Entrada -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt text-blue-600"></i>
+                </div>
+                <h3 class="ml-3 text-lg font-semibold text-gray-900">Registrar Entrada</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Registra la entrada de un vehículo al parqueadero</p>
+            <a href="{% url 'vehicle-entry' %}" class="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>Nueva Entrada
+            </a>
+        </div>
+
+        <!-- Registrar Salida -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-sign-out-alt text-red-600"></i>
+                </div>
+                <h3 class="ml-3 text-lg font-semibold text-gray-900">Registrar Salida</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Procesa la salida y cobro de vehículos</p>
+            <a href="{% url 'vehicle-exit' %}" class="block w-full text-center bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i>Procesar Salida
+            </a>
+        </div>
+
+        <!-- Reportes -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-chart-bar text-green-600"></i>
+                </div>
+                <h3 class="ml-3 text-lg font-semibold text-gray-900">Reportes</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Ver estadísticas y reportes del sistema</p>
+            <a href="{% url 'reports' %}" class="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fas fa-chart-line mr-2"></i>Ver Reportes
+            </a>
+        </div>
+
+        <!-- Cuadre de Caja -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-cash-register text-purple-600"></i>
+                </div>
+                <h3 class="ml-3 text-lg font-semibold text-gray-900">Cuadre de Caja</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Gestionar turnos y movimientos de caja</p>
+            <a href="{% url 'cash_register' %}" class="block w-full text-center bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                <i class="fas fa-calculator mr-2"></i>Cuadre de Caja
+            </a>
         </div>
     </div>
 
     <!-- Lista de Vehículos Activos -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="p-3 md:p-4 lg:p-6 border-b border-gray-200">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-base md:text-lg font-bold text-gray-900">Vehículos Actualmente en el Estacionamiento</h2>
-                    <p class="text-xs md:text-sm text-gray-500">Listado en tiempo real</p>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="fas fa-parking mr-2"></i>
+                        Vehículos Actualmente en el Estacionamiento
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Listado en tiempo real</p>
                 </div>
+                <button onclick="reloadDashboard()" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                    <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                </button>
             </div>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 table-mobile">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-2 md:px-3 lg:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Placa</th>
-                        <th class="hidden md:table-cell px-2 md:px-3 lg:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                        <th class="hidden lg:table-cell px-2 md:px-3 lg:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entrada</th>
-                        <th class="px-2 md:px-3 lg:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo</th>
-                        <th class="hidden md:table-cell px-2 md:px-3 lg:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarifa</th>
-                        <th class="px-2 md:px-3 lg:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for vehicle in stats.active_vehicles_list %}
-                    <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-2 md:px-3 lg:px-6 py-3 md:py-4 whitespace-nowrap">
-                            <div class="text-xs md:text-sm font-medium text-gray-900">{{ vehicle.placa }}</div>
-                            <div class="text-xs text-gray-500 hidden md:block">{{ vehicle.marca }}</div>
-                        </td>
-                        <td class="hidden md:table-cell px-2 md:px-3 lg:px-6 py-3 md:py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                {{ vehicle.category.name }}
-                            </span>
-                        </td>
-                        <td class="hidden lg:table-cell px-2 md:px-3 lg:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
-                            {{ vehicle.entry_time|date:"d/m/Y H:i" }}
-                        </td>
-                        <td class="px-2 md:px-3 lg:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
-                            {% with time_diff=vehicle.get_current_duration %}
-                            <span class="font-medium">{{ time_diff.hours }}h {{ time_diff.minutes }}m</span>
-                            {% endwith %}
-                        </td>
-                        <td class="hidden md:table-cell px-2 md:px-3 lg:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm">
-                            <span class="text-green-600 font-medium">${{ vehicle.calculate_current_fee|floatformat:2|intcomma }}</span>
-                        </td>
-                        <td class="px-2 md:px-3 lg:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium">
-                            <div class="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-1 md:space-x-2">
-                                <button onclick="handleExit('{{ vehicle.placa }}')" class="inline-flex items-center px-2 py-1 text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200 btn-mobile">
-                                    <i class="fas fa-sign-out-alt mr-1"></i>
-                                    <span class="hidden sm:inline">Salida</span>
-                                    <span class="sm:hidden">Salir</span>
-                                </button>
-                                <button onclick="handlePrint('{{ vehicle.id }}')" class="inline-flex items-center px-2 py-1 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 btn-mobile">
-                                    <i class="fas fa-print mr-1"></i>
-                                    <span class="hidden sm:inline">Imprimir</span>
-                                    <span class="sm:hidden">Print</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="px-3 md:px-6 py-4 text-center text-xs md:text-sm text-gray-500">
-                            <div class="flex flex-col items-center py-4 md:py-6">
-                                <i class="fas fa-parking text-gray-400 text-2xl md:text-4xl mb-2 md:mb-4"></i>
-                                <p class="text-xs md:text-sm">No hay vehículos activos en este momento</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="p-6">
+            {% if stats.active_vehicles_list %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Placa</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                <th class="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entrada</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarifa Actual</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for vehicle in stats.active_vehicles_list %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold text-gray-900">{{ vehicle.placa }}</div>
+                                        <div class="text-sm text-gray-500 md:hidden">{{ vehicle.category.name }}</div>
+                                    </td>
+                                    <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ vehicle.category.name }}
+                                        </span>
+                                    </td>
+                                    <td class="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {{ vehicle.entry_time|date:"d/m/Y H:i" }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% with time_diff=vehicle.get_current_duration %}
+                                        <span class="text-sm font-medium text-gray-900">{{ time_diff.hours }}h {{ time_diff.minutes }}m</span>
+                                        {% endwith %}
+                                    </td>
+                                    <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
+                                        <span class="text-sm font-semibold text-green-600">{{ vehicle.calculate_current_fee|format_currency:request.tenant }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex space-x-2">
+                                            <button onclick="handleExit('{{ vehicle.placa }}')" 
+                                                    class="text-red-600 hover:text-red-900 p-1 rounded" 
+                                                    title="Procesar Salida">
+                                                <i class="fas fa-sign-out-alt"></i>
+                                            </button>
+                                            <button onclick="handlePrint('{{ vehicle.id }}')" 
+                                                    class="text-blue-600 hover:text-blue-900 p-1 rounded" 
+                                                    title="Reimprimir Ticket">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="px-6 py-12 text-center">
+                                        <div class="text-gray-400">
+                                            <i class="fas fa-parking text-4xl mb-4"></i>
+                                            <p class="text-sm">No hay vehículos activos en este momento</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-parking text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay vehículos activos</h3>
+                    <p class="text-gray-500 mb-6">No hay vehículos estacionados en este momento</p>
+                    <a href="{% url 'vehicle-entry' %}" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Registrar Primera Entrada
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Estadísticas -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+    <!-- Estadísticas adicionales -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Estadísticas por Categoría -->
-        <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 card-mobile">
-            <h2 class="text-base md:text-lg font-bold text-gray-900 mb-3 md:mb-4 flex items-center">
-                <i class="fas fa-chart-pie mr-2 text-blue-500"></i>
-                Estadísticas por Categoría
-            </h2>
-            <div class="space-y-2 md:space-y-4">
-                {% for stat in stats.category %}
-                <div class="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                    <span class="font-medium text-gray-700 text-xs md:text-sm truncate">{{ stat.category__name }}</span>
-                    <div class="text-right min-w-0">
-                        <span class="block text-xs text-gray-500">Vehículos: {{ stat.count }}</span>
-                        <span class="block text-xs md:text-sm font-medium text-green-600">Ingresos: ${{ stat.revenue|default:0|floatformat:2|intcomma }}</span>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">
+                    <i class="fas fa-chart-pie mr-2"></i>
+                    Estadísticas por Categoría
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if stats.category %}
+                    <div class="space-y-4">
+                        {% for stat in stats.category %}
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">{{ stat.category__name }}</span>
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-500">{{ stat.count }} vehículos</div>
+                                    <div class="font-semibold text-green-600">{{ stat.revenue|default:0|format_currency:request.tenant }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-4 md:py-6 text-gray-500">
-                    <i class="fas fa-chart-pie text-gray-400 text-2xl md:text-4xl mb-2 md:mb-4"></i>
-                    <p class="text-xs md:text-sm">No hay datos disponibles</p>
-                </div>
-                {% endfor %}
+                {% else %}
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-chart-pie text-4xl mb-4"></i>
+                        <p>No hay datos disponibles</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
         <!-- Estadísticas Diarias -->
-        <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 card-mobile">
-            <h2 class="text-base md:text-lg font-bold text-gray-900 mb-3 md:mb-4 flex items-center">
-                <i class="fas fa-calendar-day mr-2 text-green-500"></i>
-                Estadísticas Diarias
-            </h2>
-            <div class="space-y-2 md:space-y-4">
-                {% for stat in daily_stats %}
-                <div class="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                    <span class="font-medium text-gray-700 text-xs md:text-sm">{{ stat.date }}</span>
-                    <span class="text-green-600 font-medium text-xs md:text-sm">${{ stat.revenue|floatformat:2|intcomma }}</span>
-                </div>
-                {% empty %}
-                <div class="text-center py-4 md:py-6 text-gray-500">
-                    <i class="fas fa-calendar-day text-gray-400 text-2xl md:text-4xl mb-2 md:mb-4"></i>
-                    <p class="text-xs md:text-sm">No hay estadísticas disponibles</p>
-                </div>
-                {% endfor %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">
+                    <i class="fas fa-calendar-day mr-2"></i>
+                    Estadísticas Diarias
+                </h3>
             </div>
-        </div>
-    </div>
-
-    <!-- Enlaces Rápidos -->
-    <div class="bg-white rounded-xl shadow-lg p-3 md:p-4 lg:p-6 card-mobile">
-        <h2 class="text-base md:text-lg font-bold text-gray-900 mb-3 md:mb-4 flex items-center">
-            <i class="fas fa-link mr-2 text-purple-500"></i>
-            Enlaces Rápidos
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            <!-- Gestión de Empresa -->
-            <a href="{% url 'company_profile' %}" class="flex items-center p-3 md:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-building text-blue-600 text-lg md:text-xl"></i>
-                </div>
-                <div class="ml-3 min-w-0 flex-1">
-                    <p class="text-xs md:text-sm font-medium text-gray-900 truncate">Perfil de Empresa</p>
-                    <p class="text-xs text-gray-500 truncate">Ver y editar información</p>
-                </div>
-            </a>
-
-            <!-- Categorías -->
-            <a href="{% url 'category-list' %}" class="flex items-center p-3 md:p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-200">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-tags text-green-600 text-lg md:text-xl"></i>
-                </div>
-                <div class="ml-3 min-w-0 flex-1">
-                    <p class="text-xs md:text-sm font-medium text-gray-900 truncate">Categorías</p>
-                    <p class="text-xs text-gray-500 truncate">Gestionar tarifas</p>
-                </div>
-            </a>
-
-            <!-- Reportes -->
-            <a href="{% url 'reports' %}" class="flex items-center p-3 md:p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-chart-bar text-purple-600 text-lg md:text-xl"></i>
-                </div>
-                <div class="ml-3 min-w-0 flex-1">
-                    <p class="text-xs md:text-sm font-medium text-gray-900 truncate">Reportes</p>
-                    <p class="text-xs text-gray-500 truncate">Ver estadísticas</p>
-                </div>
-            </a>
-
-            <!-- Caja -->
-            <a href="{% url 'cash_register' %}" class="flex items-center p-3 md:p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors duration-200">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-cash-register text-yellow-600 text-lg md:text-xl"></i>
-                </div>
-                <div class="ml-3 min-w-0 flex-1">
-                    <p class="text-xs md:text-sm font-medium text-gray-900 truncate">Caja</p>
-                    <p class="text-xs text-gray-500 truncate">Cuadre de caja</p>
-                </div>
-            </a>
+            <div class="card-body">
+                {% if daily_stats %}
+                    <div class="space-y-4">
+                        {% for stat in daily_stats %}
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">{{ stat.date }}</span>
+                                <span class="font-semibold text-green-600">{{ stat.revenue|format_currency:request.tenant }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-day text-4xl mb-4"></i>
+                        <p>No hay estadísticas disponibles</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

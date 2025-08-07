@@ -1,0 +1,133 @@
+{% extends 'parking/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Tipo de Impuesto{% else %}Nuevo Tipo de Impuesto{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1>
+        <i class="fas fa-percentage mr-3"></i>
+        {% if form.instance.pk %}Editar Tipo de Impuesto{% else %}Nuevo Tipo de Impuesto{% endif %}
+    </h1>
+    <p class="text-gray-600 mt-2">
+        {% if form.instance.pk %}
+            Modifica la información del tipo de impuesto
+        {% else %}
+            Crea un nuevo tipo de impuesto para el sistema
+        {% endif %}
+    </p>
+</div>
+
+<div class="content-body">
+    <div class="max-w-2xl mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">
+                    <i class="fas fa-edit mr-2"></i>
+                    Información del Tipo de Impuesto
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Nombre del impuesto -->
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.name.label }}
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Código y Porcentaje -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.code.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.code.label }}
+                            </label>
+                            {{ form.code }}
+                            {% if form.code.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.code.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.rate.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.rate.label }}
+                            </label>
+                            {{ form.rate }}
+                            {% if form.rate.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.rate.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.description.label }}
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Opciones -->
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            {{ form.is_active }}
+                            <label for="{{ form.is_active.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ form.is_active.label }}
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {{ form.is_default }}
+                            <label for="{{ form.is_default.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ form.is_default.label }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-2"></i>
+                            {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Tipo de Impuesto
+                        </button>
+                        <a href="{% url 'tax-type-list' %}" class="btn bg-gray-500 text-white hover:bg-gray-600">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="mt-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-lg font-semibold">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Información sobre Tipos de Impuestos
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-sm text-gray-600 space-y-2">
+                        <p><strong>Código:</strong> Identificador único del impuesto (ej: IVA, IGV, GST)</p>
+                        <p><strong>Porcentaje:</strong> Tasa del impuesto en porcentaje (ej: 19.00 para 19%)</p>
+                        <p><strong>Por Defecto:</strong> Solo puede haber un tipo de impuesto marcado como por defecto</p>
+                        <p><strong>Activo:</strong> Solo los impuestos activos aparecerán en las opciones del sistema</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

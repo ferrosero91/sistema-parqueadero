@@ -750,3 +750,420 @@ UserProfile.get_permissions = userprofile_get_permissions
 UserProfile.get_modules = userprofile_get_modules
 UserProfile.get_roles = userprofile_get_roles
 UserProfile.get_primary_role = userprofile_get_primary_role
+
+# =============================================================================
+# MODELOS DE CONFIGURACIÓN DEL SISTEMA
+# =============================================================================
+
+class Currency(models.Model):
+    """Modelo para configurar monedas por tenant"""
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, verbose_name="Empresa")
+    name = models.CharField(max_length=50, verbose_name="Nombre de la moneda")
+    code = models.CharField(max_length=10, verbose_name="Código de la moneda")  # USD, COP, PEN, etc.
+    symbol = models.CharField(max_length=5, verbose_name="Símbolo")  # $, S/, etc.
+    decimal_places = models.IntegerField(default=2, verbose_name="Decimales")
+    is_active = models.BooleanField(default=True, verbose_name="Activa")
+    is_default = models.BooleanField(default=False, verbose_name="Moneda por defecto")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
+
+    objects = TenantManager()
+
+    class Meta:
+        verbose_name = "Moneda"
+        verbose_name_plural = "Monedas"
+        unique_together = ['tenant', 'code']
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.symbol})"
+
+    def save(self, *args, **kwargs):
+        # Si se marca como default, desmarcar las demás del mismo tenant
+        if self.is_default:
+            Currency.objects.filter(tenant=self.tenant, is_default=True).update(is_default=False)
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_default_currencies(cls):
+        """Obtener monedas por defecto del sistema"""
+        return [
+            {'name': 'Peso Colombiano', 'code': 'COP', 'symbol': '$', 'decimal_places': 0},
+            {'name': 'Dólar Americano', 'code': 'USD', 'symbol': '$', 'decimal_places': 2},
+            {'name': 'Sol Peruano', 'code': 'PEN', 'symbol': 'S/', 'decimal_places': 2},
+            {'name': 'Euro', 'code': 'EUR', 'symbol': '€', 'decimal_places': 2},
+            {'name': 'Peso Mexicano', 'code': 'MXN', 'symbol': '$', 'decimal_places': 2},
+            {'name': 'Peso Argentino', 'code': 'ARS', 'symbol': '$', 'decimal_places': 2},
+        ]
+
+    def format_amount(self, amount, use_tenant_separators=True):
+        """Formatear un monto según la configuración de la moneda y tenant"""
+        try:
+            if use_tenant_separators:
+                # Intentar usar los separadores configurados del tenant
+                config = self.tenant.tenantconfiguration
+                thousand_sep = config.thousand_separator
+                decimal_sep = config.decimal_separator
+                
+                # Formatear el número
+                if self.decimal_places == 0:
+                    # Sin decimales
+                    formatted_number = f"{amount:,.0f}".replace(',', thousand_sep)
+                else:
+                    # Con decimales
+                    formatted_number = f"{amount:,.{self.decimal_places}f}"
+                    # Reemplazar separadores
+                    formatted_number = formatted_number.replace(',', '|TEMP|')  # Temporal
+                    formatted_number = formatted_number.replace('.', decimal_sep)
+                    formatted_number = formatted_number.replace('|TEMP|', thousand_sep)
+                
+                return f"{self.symbol}{formatted_number}"
+            else:
+                # Formato estándar
+                if self.decimal_places == 0:
+                    return f"{self.symbol}{amount:,.0f}"
+                else:
+                    return f"{self.symbol}{amount:,.{self.decimal_places}f}"
+        except:
+            # Fallback al formato estándar
+            if self.decimal_places == 0:
+                return f"{self.symbol}{amount:,.0f}"
+            else:
+                return f"{self.symbol}{amount:,.{self.decimal_places}f}"
+
+
+class TaxType(models.Model):
+    """Modelo para configurar tipos de impuestos por tenant"""
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, verbose_name="Empresa")
+    name = models.CharField(max_length=50, verbose_name="Nombre del impuesto")
+    code = models.CharField(max_length=10, verbose_name="Código del impuesto")  # IVA, IGV, VAT, etc.
+    rate = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Porcentaje")  # 19.00 para 19%
+    is_active = models.BooleanField(default=True, verbose_name="Activo")
+    is_default = models.BooleanField(default=False, verbose_name="Impuesto por defecto")
+    description = models.TextField(blank=True, verbose_name="Descripción")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
+
+    objects = TenantManager()
+
+    class Meta:
+        verbose_name = "Tipo de Impuesto"
+        verbose_name_plural = "Tipos de Impuestos"
+        unique_together = ['tenant', 'code']
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.rate}%)"
+
+    def save(self, *args, **kwargs):
+        # Si se marca como default, desmarcar los demás del mismo tenant
+        if self.is_default:
+            TaxType.objects.filter(tenant=self.tenant, is_default=True).update(is_default=False)
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_default_tax_types(cls):
+        """Obtener tipos de impuestos por defecto del sistema"""
+        return [
+            {'name': 'IVA Colombia', 'code': 'IVA', 'rate': 19.00, 'description': 'Impuesto al Valor Agregado - Colombia'},
+            {'name': 'IGV Perú', 'code': 'IGV', 'rate': 18.00, 'description': 'Impuesto General a las Ventas - Perú'},
+            {'name': 'IVA México', 'code': 'IVA', 'rate': 16.00, 'description': 'Impuesto al Valor Agregado - México'},
+            {'name': 'IVA Argentina', 'code': 'IVA', 'rate': 21.00, 'description': 'Impuesto al Valor Agregado - Argentina'},
+            {'name': 'VAT España', 'code': 'VAT', 'rate': 21.00, 'description': 'Value Added Tax - España'},
+        ]
+
+    def calculate_tax(self, base_amount):
+        """Calcular el impuesto sobre un monto base"""
+        return base_amount * (self.rate / 100)
+
+    def calculate_total_with_tax(self, base_amount):
+        """Calcular el total incluyendo impuesto"""
+        return base_amount + self.calculate_tax(base_amount)
+
+    def calculate_base_from_total(self, total_amount):
+        """
+        Calcular el monto base desde el total (método colombiano)
+        Si el total es 5000 y el impuesto es 19%:
+        Base = 5000 / 1.19 = 4201.68
+        """
+        tax_factor = 1 + (float(self.rate) / 100)
+        return total_amount / tax_factor
+
+    def calculate_tax_from_total(self, total_amount):
+        """
+        Calcular el impuesto desde el total
+        Si el total es 5000 y el impuesto es 19%:
+        Impuesto = 5000 - (5000 / 1.19) = 798.32
+        """
+        base_amount = self.calculate_base_from_total(total_amount)
+        return total_amount - base_amount
+
+    def get_tax_breakdown_from_total(self, total_amount):
+        """Obtener desglose completo desde el total"""
+        base_amount = self.calculate_base_from_total(total_amount)
+        tax_amount = self.calculate_tax_from_total(total_amount)
+        
+        return {
+            'base_amount': round(base_amount, 2),
+            'tax_name': self.name,
+            'tax_code': self.code,
+            'tax_rate': float(self.rate),
+            'tax_amount': round(tax_amount, 2),
+            'total_amount': total_amount,
+            'tax_factor': 1 + (float(self.rate) / 100)
+        }
+
+
+class TenantConfiguration(models.Model):
+    """Modelo para configuraciones generales del tenant"""
+    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, verbose_name="Empresa")
+    
+    # Configuración de moneda
+    default_currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Moneda por defecto")
+    
+    # Configuración de impuestos
+    default_tax_type = models.ForeignKey(TaxType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Impuesto por defecto")
+    apply_tax_by_default = models.BooleanField(default=False, verbose_name="Aplicar impuesto por defecto")
+    
+    # Configuración de tickets
+    include_tax_in_ticket = models.BooleanField(default=False, verbose_name="Incluir impuesto en ticket")
+    show_tax_breakdown = models.BooleanField(default=True, verbose_name="Mostrar desglose de impuesto")
+    
+    # Configuración de formato de números
+    thousand_separator = models.CharField(max_length=1, default='.', verbose_name="Separador de miles")
+    decimal_separator = models.CharField(max_length=1, default=',', verbose_name="Separador decimal")
+    
+    # Configuración de la empresa
+    company_logo = models.ImageField(upload_to='logos/', blank=True, null=True, verbose_name="Logo de la empresa")
+    receipt_footer_text = models.TextField(blank=True, verbose_name="Texto pie de página en recibos")
+    
+    # Configuración de zona horaria
+    timezone = models.CharField(max_length=50, default='America/Bogota', verbose_name="Zona horaria")
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
+
+    class Meta:
+        verbose_name = "Configuración de Empresa"
+        verbose_name_plural = "Configuraciones de Empresa"
+
+    def __str__(self):
+        return f"Configuración - {self.tenant.name}"
+
+    def get_currency_symbol(self):
+        """Obtener el símbolo de la moneda por defecto"""
+        if self.default_currency:
+            return self.default_currency.symbol
+        return '$'  # Símbolo por defecto
+
+    def format_amount(self, amount):
+        """Formatear un monto según la configuración"""
+        if self.default_currency:
+            return self.default_currency.format_amount(amount)
+        return f"${amount:,.2f}"
+
+    def calculate_with_tax(self, base_amount):
+        """Calcular monto con impuesto si está configurado"""
+        if self.apply_tax_by_default and self.default_tax_type:
+            return self.default_tax_type.calculate_total_with_tax(base_amount)
+        return base_amount
+
+    def get_tax_info(self, base_amount):
+        """Obtener información detallada del impuesto"""
+        if self.apply_tax_by_default and self.default_tax_type:
+            tax_amount = self.default_tax_type.calculate_tax(base_amount)
+            total_amount = base_amount + tax_amount
+            return {
+                'base_amount': base_amount,
+                'tax_name': self.default_tax_type.name,
+                'tax_rate': self.default_tax_type.rate,
+                'tax_amount': tax_amount,
+                'total_amount': total_amount,
+                'has_tax': True
+            }
+        return {
+            'base_amount': base_amount,
+            'tax_name': None,
+            'tax_rate': 0,
+            'tax_amount': 0,
+            'total_amount': base_amount,
+            'has_tax': False
+        }
+
+    def calculate_tax_breakdown_from_total(self, total_amount):
+        """
+        Calcular desglose de impuesto desde el total (método colombiano)
+        Si el total es 5000 y el impuesto es 19%, entonces:
+        - Subtotal = 5000 / 1.19 = 4201.68
+        - Impuesto = 5000 - 4201.68 = 798.32
+        """
+        if self.apply_tax_by_default and self.default_tax_type:
+            tax_rate = float(self.default_tax_type.rate)
+            tax_factor = 1 + (tax_rate / 100)  # 1.19 para 19%
+            
+            subtotal = total_amount / tax_factor
+            tax_amount = total_amount - subtotal
+            
+            return {
+                'subtotal': round(subtotal, 2),
+                'tax_name': self.default_tax_type.name,
+                'tax_rate': tax_rate,
+                'tax_amount': round(tax_amount, 2),
+                'total_amount': total_amount,
+                'has_tax': True,
+                'tax_factor': tax_factor
+            }
+        return {
+            'subtotal': total_amount,
+            'tax_name': None,
+            'tax_rate': 0,
+            'tax_amount': 0,
+            'total_amount': total_amount,
+            'has_tax': False,
+            'tax_factor': 1
+        }
+
+
+# =============================================================================
+# EXTENSIONES A MODELOS EXISTENTES
+# =============================================================================
+
+# Agregar métodos helper al modelo VehicleCategory para manejar impuestos
+def vehiclecategory_calculate_rate_with_tax(self, rate_type='first_hour'):
+    """Calcular tarifa con impuesto si está configurado"""
+    try:
+        config = self.tenant.tenantconfiguration
+        if rate_type == 'first_hour':
+            base_rate = self.first_hour_rate
+        elif rate_type == 'additional_hour':
+            base_rate = self.additional_hour_rate
+        elif rate_type == 'monthly':
+            base_rate = self.monthly_rate or 0
+        else:
+            base_rate = self.first_hour_rate
+        
+        return config.calculate_with_tax(base_rate)
+    except:
+        # Si no hay configuración, devolver la tarifa base
+        if rate_type == 'first_hour':
+            return self.first_hour_rate
+        elif rate_type == 'additional_hour':
+            return self.additional_hour_rate
+        elif rate_type == 'monthly':
+            return self.monthly_rate or 0
+        else:
+            return self.first_hour_rate
+
+def vehiclecategory_get_formatted_rate(self, rate_type='first_hour'):
+    """Obtener tarifa formateada con moneda"""
+    try:
+        config = self.tenant.tenantconfiguration
+        rate = self.calculate_rate_with_tax(rate_type)
+        return config.format_amount(rate)
+    except:
+        # Formato por defecto
+        if rate_type == 'first_hour':
+            return f"${self.first_hour_rate:,.0f}"
+        elif rate_type == 'additional_hour':
+            return f"${self.additional_hour_rate:,.0f}"
+        elif rate_type == 'monthly':
+            return f"${self.monthly_rate or 0:,.0f}"
+        else:
+            return f"${self.first_hour_rate:,.0f}"
+
+# Agregar métodos a VehicleCategory
+VehicleCategory.calculate_rate_with_tax = vehiclecategory_calculate_rate_with_tax
+VehicleCategory.get_formatted_rate = vehiclecategory_get_formatted_rate
+
+
+# Agregar métodos helper al modelo ParkingTicket para manejar impuestos
+def parkingticket_calculate_fee_with_tax(self):
+    """Calcular tarifa con impuesto"""
+    base_fee = self.calculate_fee()
+    try:
+        config = self.tenant.tenantconfiguration
+        return config.calculate_with_tax(base_fee)
+    except:
+        return base_fee
+
+def parkingticket_get_fee_breakdown(self):
+    """Obtener desglose detallado de la tarifa"""
+    total_fee = self.calculate_fee()  # Este es el total que debe pagar
+    try:
+        config = self.tenant.tenantconfiguration
+        if config.apply_tax_by_default and config.default_tax_type:
+            # Usar el método colombiano: dividir el total entre el factor de impuesto
+            return config.calculate_tax_breakdown_from_total(total_fee)
+        else:
+            return {
+                'subtotal': total_fee,
+                'tax_name': None,
+                'tax_rate': 0,
+                'tax_amount': 0,
+                'total_amount': total_fee,
+                'has_tax': False,
+                'tax_factor': 1
+            }
+    except:
+        return {
+            'subtotal': total_fee,
+            'tax_name': None,
+            'tax_rate': 0,
+            'tax_amount': 0,
+            'total_amount': total_fee,
+            'has_tax': False,
+            'tax_factor': 1
+        }
+
+def parkingticket_get_formatted_fee(self):
+    """Obtener tarifa formateada con moneda"""
+    fee = self.calculate_fee()  # Total a pagar
+    try:
+        config = self.tenant.tenantconfiguration
+        if config.default_currency:
+            return config.default_currency.format_amount(fee)
+        else:
+            return f"${fee:,.0f}"
+    except:
+        return f"${fee:,.0f}"
+
+def parkingticket_get_formatted_breakdown(self):
+    """Obtener desglose formateado de la tarifa"""
+    breakdown = self.get_fee_breakdown()
+    try:
+        config = self.tenant.tenantconfiguration
+        currency = config.default_currency
+        
+        if currency:
+            result = {
+                'subtotal_formatted': currency.format_amount(breakdown['subtotal']),
+                'tax_amount_formatted': currency.format_amount(breakdown['tax_amount']),
+                'total_formatted': currency.format_amount(breakdown['total_amount']),
+                'currency_symbol': currency.symbol,
+                **breakdown  # Incluir todos los datos originales
+            }
+        else:
+            result = {
+                'subtotal_formatted': f"${breakdown['subtotal']:,.0f}",
+                'tax_amount_formatted': f"${breakdown['tax_amount']:,.0f}",
+                'total_formatted': f"${breakdown['total_amount']:,.0f}",
+                'currency_symbol': '$',
+                **breakdown
+            }
+        
+        return result
+    except:
+        return {
+            'subtotal_formatted': f"${breakdown['subtotal']:,.0f}",
+            'tax_amount_formatted': f"${breakdown['tax_amount']:,.0f}",
+            'total_formatted': f"${breakdown['total_amount']:,.0f}",
+            'currency_symbol': '$',
+            **breakdown
+        }
+
+# Agregar métodos a ParkingTicket
+ParkingTicket.calculate_fee_with_tax = parkingticket_calculate_fee_with_tax
+ParkingTicket.get_fee_breakdown = parkingticket_get_fee_breakdown
+ParkingTicket.get_formatted_fee = parkingticket_get_formatted_fee
+ParkingTicket.get_formatted_breakdown = parkingticket_get_formatted_breakdown
+

@@ -988,10 +988,14 @@
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="sidebar-brand-icon">
-                        <i class="fas fa-parking"></i>
+                        {% if company_logo %}
+                            <img src="{{ company_logo }}" alt="Logo" class="w-full h-full object-contain rounded-lg">
+                        {% else %}
+                            <i class="fas fa-parking"></i>
+                        {% endif %}
                     </div>
                     <div class="sidebar-brand-text">
-                        <h1>SoluPark</h1>
+                        <h1>{% if current_tenant %}{{ current_tenant.name }}{% else %}SoluPark{% endif %}</h1>
                         <p>Sistema de Estacionamiento</p>
                     </div>
                 </div>
@@ -1050,6 +1054,11 @@
 
                 <div class="nav-section">
                     <div class="nav-section-title">Configuración</div>
+                    
+                    <a href="{% url 'config_dashboard' %}" class="nav-item {% if 'config' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-cogs"></i>
+                        Dashboard de Configuración
+                    </a>
                     
                     <a href="{% url 'company_profile' %}" class="nav-item {% if request.resolver_match.url_name == 'company_profile' %}active{% endif %}">
                         <i class="fas fa-building"></i>
@@ -1169,7 +1178,7 @@
             <div class="main-content">
                 <div class="content-container">
                     <div class="content-header">
-                        <h1 id="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                        <h1 id="page-title">{% block page_title %}{% endblock %}</h1>
                     </div>
                     <div class="content-body">
                         {% block content %}
@@ -1260,7 +1269,7 @@
         function updatePageTitle() {
             const path = window.location.pathname;
             const titles = {
-                '/dashboard/': 'Dashboard',
+                '/dashboard/': 'Dashboard Principal',
                 '/entry/': 'Registro de Ingreso',
                 '/exit/': 'Registro de Salida',
                 '/categorias/': 'Gestión de Categorías',
@@ -1270,8 +1279,8 @@
                 '/usuarios/': 'Gestión de Usuarios'
             };
             
-            const title = titles[path] || 'Dashboard';
-            if (pageTitle) {
+            const title = titles[path] || '';
+            if (pageTitle && title) {
                 pageTitle.textContent = title;
             }
         }

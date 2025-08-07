@@ -2,53 +2,33 @@ from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
 import dj_database_url
+from decouple import config, Csv
 
 # BASE_DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Clave secreta
-SECRET_KEY = os.getenv(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-ur(&_h7gldf8k1&a7d976gt%c7%2a@3(3!v$zk#=_+f10cxd03'
-)
+# Configuración de seguridad usando variables de entorno
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Debug
-DEBUG = False
+# Hosts y CSRF usando variables de entorno
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
-# Hosts y CSRF - Mejorado para Coolify
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '192.168.1.128',
-    '192.168.1.128:3001',
-    '173.212.208.35',
-    '173.212.208.35:3001',
-    'parqueadero.sufactura.store',
-    '*.sufactura.store',
-    '*',
-]
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost,http://127.0.0.1', cast=Csv())
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost',
-    'http://127.0.0.1',
-    'https://parqueadero.sufactura.store',
-    'http://192.168.1.128',
-    'http://192.168.1.128:3001',
-]
+# Configuración de seguridad usando variables de entorno
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
 
-# Seguridad en producción - Ajustado para Coolify
+# Configuración adicional de seguridad para producción
 if not DEBUG:
-    # SECURE_SSL_REDIRECT = True  # Puedes activarlo si ya usas HTTPS correctamente
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    # SESSION_COOKIE_SECURE = True
-    # CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-else:
-    SECURE_SSL_REDIRECT = False
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -68,6 +48,7 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise agregado aquí
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -94,6 +75,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'parking.context_processors.tenant_context',
+                'parking.context_processors.system_info',
             ],
             'debug': DEBUG,
         },
@@ -103,20 +86,30 @@ TEMPLATES = [
 # WSGI
 WSGI_APPLICATION = 'parking_system.wsgi.application'
 
-# # Base de datos
-DATABASES = {
-    'default': dj_database_url.config(
-        default="postgres://postgres:DNM5GFM2Ohe64dU9q7lOxOwc35HxDJkgt7QpcPXKVf8IiYI7033UVkSDTXp9Cvjv@x4cg08ooggc08ws4owowcso8:5432/postgres"
-    )
-}
+# Configuración de base de datos
+# SQLite para desarrollo local, PostgreSQL para producción
+DATABASE_URL = config('DATABASE_URL', default='sqlite:///db.sqlite3')
 
-# Configuración de base de datos SQLite para desarrollo
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+if DATABASE_URL.startswith('sqlite'):
+    # Configuración específica para SQLite (desarrollo local)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+            'OPTIONS': {
+                'timeout': 20,
+            }
+        }
+    }
+else:
+    # Configuración para PostgreSQL u otras bases de datos (producción)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 
 
 # Validadores de contraseñas
@@ -138,7 +131,7 @@ THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
 NUMBER_GROUPING = 3
 
-# Archivos estáticos - Listo para producción
+# Archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -173,42 +166,19 @@ MESSAGE_TAGS = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-# Logging para producción
+# Logging básico
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{levelname}] {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
         },
     },
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'parking': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
     },
 }
 

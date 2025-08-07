@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=parqueadero-super-secret-key-2024-production-change-this
+      - DATABASE_URL=postgres://postgres:DNM5GFM2Ohe64dU9q7lOxOwc35HxDJkgt7QpcPXKVf8IiYI7033UVkSDTXp9Cvjv@x4cg08ooggc08ws4owowcso8:5432/postgres
+      - ALLOWED_HOSTS=localhost,127.0.0.1,173.212.208.35,parqueadero.sufactura.store,*.sufactura.store
+      - CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1,http://173.212.208.35:8081,https://parqueadero.sufactura.store
+      - SECURE_SSL_REDIRECT=False
+      - SESSION_COOKIE_SECURE=False
+      - CSRF_COOKIE_SECURE=False
+      - USE_TZ=True
+      - TIME_ZONE=America/Bogota
+      - LANGUAGE_CODE=es-co
+    restart: unless-stopped
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8081 --workers 3 parking_system.wsgi:application"

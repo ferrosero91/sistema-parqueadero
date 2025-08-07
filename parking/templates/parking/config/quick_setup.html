@@ -1,0 +1,179 @@
+{% extends 'parking/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-rocket text-blue-600 text-2xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900">Configuración Rápida</h1>
+        <p class="mt-2 text-gray-600">Configura tu sistema en pocos pasos para empezar a usarlo inmediatamente</p>
+    </div>
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="rounded-lg p-4 {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+            <h2 class="text-xl font-semibold text-white">Configuración Inicial</h2>
+            <p class="text-blue-100 text-sm">Selecciona tu moneda e impuesto para comenzar</p>
+        </div>
+
+        <form method="POST" class="p-6 space-y-6">
+            {% csrf_token %}
+
+            <!-- Paso 1: Moneda -->
+            <div class="border-b border-gray-200 pb-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-green-600 font-semibold">1</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Seleccionar Moneda</h3>
+                </div>
+                
+                <div class="ml-11">
+                    <label for="{{ form.currency_choice.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.currency_choice.label }}
+                    </label>
+                    {{ form.currency_choice }}
+                    {% if form.currency_choice.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.currency_choice.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Esta será la moneda principal para mostrar precios y generar recibos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paso 2: Impuesto -->
+            <div class="border-b border-gray-200 pb-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-blue-600 font-semibold">2</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Configurar Impuesto (Opcional)</h3>
+                </div>
+                
+                <div class="ml-11 space-y-4">
+                    <div>
+                        <label for="{{ form.tax_choice.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.tax_choice.label }}
+                        </label>
+                        {{ form.tax_choice }}
+                        {% if form.tax_choice.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.tax_choice.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-2 text-sm text-gray-500">
+                            Selecciona el tipo de impuesto que aplica en tu país (IVA, IGV, etc.).
+                        </p>
+                    </div>
+
+                    <div class="flex items-center">
+                        {{ form.apply_tax }}
+                        <label for="{{ form.apply_tax.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.apply_tax.label }}
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-500">
+                        Si activas esta opción, el impuesto se aplicará automáticamente a todas las tarifas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paso 3: Confirmación -->
+            <div>
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-purple-600 font-semibold">3</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Finalizar Configuración</h3>
+                </div>
+                
+                <div class="ml-11">
+                    <p class="text-sm text-gray-600 mb-4">
+                        Una vez completada la configuración, podrás:
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-1 mb-6">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Crear categorías de vehículos con precios en tu moneda
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Generar tickets con el formato correcto
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Aplicar impuestos automáticamente si los configuraste
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Modificar estas configuraciones cuando lo necesites
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-between pt-6 border-t border-gray-200">
+                <a href="{% url 'config-dashboard' %}" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver
+                </a>
+                <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-rocket mr-2"></i>Completar Configuración
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">¿Necesitas ayuda?</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Puedes cambiar estas configuraciones en cualquier momento desde el panel de configuración</li>
+                        <li>Si no encuentras tu moneda o impuesto, podrás crearlos manualmente después</li>
+                        <li>La configuración de impuestos es opcional y puede activarse más tarde</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const taxChoice = document.getElementById('{{ form.tax_choice.id_for_label }}');
+    const applyTax = document.getElementById('{{ form.apply_tax.id_for_label }}');
+    
+    // Habilitar/deshabilitar checkbox de aplicar impuesto según selección
+    function toggleApplyTax() {
+        if (taxChoice.value === '') {
+            applyTax.disabled = true;
+            applyTax.checked = false;
+        } else {
+            applyTax.disabled = false;
+        }
+    }
+    
+    taxChoice.addEventListener('change', toggleApplyTax);
+    toggleApplyTax(); // Ejecutar al cargar
+});
+</script>
+{% endblock %}

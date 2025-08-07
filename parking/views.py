@@ -228,37 +228,63 @@ class VehicleEntryView(CreateView):
 @tenant_required
 @cajero_required
 def vehicle_exit(request):
+    print(f"vehicle_exit called - Method: {request.method}")
+    
     if request.method == 'POST':
         identifier = request.POST.get('identifier')
+        print(f"Searching for vehicle with identifier: {identifier}")
+        
         ticket = ParkingTicket.objects.filter(
             tenant=request.tenant,
             placa__iexact=identifier,
             exit_time=None
         ).first()
+        
+        print(f"Ticket found: {ticket is not None}")
 
         if ticket:
             try:
                 # Solo retornar datos, NO registrar salida ni movimiento
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    print("Processing AJAX request")
+                    
                     duration = ticket.get_current_duration() if not ticket.exit_time else ticket.get_duration()
                     if isinstance(duration, dict):
                         duration_str = f"{duration['hours']}h {duration['minutes']}m"
                     else:
                         duration_str = f"{duration}h"
-                    return JsonResponse({
-                        'amount': ticket.calculate_current_fee() if not ticket.exit_time else ticket.calculate_fee(),
+                    
+                    # Calcular el monto total
+                    total_amount = ticket.calculate_current_fee() if not ticket.exit_time else ticket.calculate_fee()
+                    print(f"Total amount calculated: {total_amount}")
+                    
+                    # Obtener desglose de impuestos
+                    breakdown = ticket.get_formatted_breakdown()
+                    print(f"Breakdown: {breakdown}")
+                    
+                    response_data = {
+                        'amount': total_amount,
                         'duration': duration_str,
                         'placa': ticket.placa,
                         'entry_time': ticket.entry_time.strftime('%Y-%m-%d %H:%M:%S'),
-                        'ticket_id': str(ticket.id)
-                    })
+                        'ticket_id': str(ticket.id),
+                        'tax_breakdown': breakdown
+                    }
+                    print(f"Returning response: {response_data}")
+                    
+                    return JsonResponse(response_data)
             except Exception as e:
+                print(f"Error in vehicle_exit: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'error': str(e)}, status=500)
                 messages.error(request, f'Error: {str(e)}')
                 return redirect('vehicle-exit')
 
         # Si no se encuentra el ticket
+        print("Vehicle not found")
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': 'Vehículo no encontrado'}, status=404)
         messages.error(request, 'Vehículo no encontrado')
@@ -266,6 +292,7 @@ def vehicle_exit(request):
 
     # Para solicitudes GET
     placa = request.GET.get('placa', '')
+    print(f"GET request - placa: {placa}")
     return render(request, 'parking/vehicle_exit.html', {
         'placa': placa,
     })
@@ -276,9 +303,17 @@ def vehicle_exit(request):
 @cajero_required
 def print_exit_ticket(request):
     if request.method == 'POST':
+        print(f"print_exit_ticket POST recibido")
+        print(f"POST data: {request.POST}")
+        print(f"Headers: {dict(request.headers)}")
+        
         ticket_id = request.POST.get('ticket_id')
         amount_received = request.POST.get('amount_received')
         forma_pago = request.POST.get('forma_pago', 'efectivo')
+        
+        print(f"ticket_id: {ticket_id}")
+        print(f"amount_received: {amount_received}")
+        print(f"forma_pago: {forma_pago}")
 
         if ticket_id and amount_received:
             try:
@@ -338,6 +373,9 @@ def print_exit_ticket(request):
                 messages.error(request, 'El monto recibido no es válido')
                 return redirect('vehicle-exit')
             except Exception as e:
+                import traceback
+                print(f"Error en print_exit_ticket: {str(e)}")
+                print(traceback.format_exc())
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': False, 'error': f'Error al imprimir ticket: {str(e)}'}, status=500)
                 messages.error(request, f'Error al imprimir ticket: {str(e)}')
@@ -395,6 +433,19 @@ def dashboard(request):
         amount_paid__isnull=False
     ).aggregate(total=Sum('amount_paid'))['total'] or 0
     
+    # Si no hay ingresos de hoy, intentar con todos los tickets completados
+    if today_income == 0:
+        today_income = ParkingTicket.objects.filter(
+            tenant=tenant,
+            exit_time__isnull=False,
+            amount_paid__isnull=False
+        ).aggregate(total=Sum('amount_paid'))['total'] or 0
+    
+    print(f"DEBUG Dashboard - Today: {today}")
+    print(f"DEBUG Dashboard - Today income: {today_income}")
+    print(f"DEBUG Dashboard - Active tickets: {active_tickets}")
+    print(f"DEBUG Dashboard - Total tickets: {total_tickets}")
+    
     # Tickets del día
     today_tickets = ParkingTicket.objects.filter(
         tenant=tenant,
@@ -419,6 +470,10 @@ def dashboard(request):
         completed_tickets=Count('parkingticket', filter=Q(parkingticket__exit_time__isnull=False))
     ).order_by('-total_tickets')
     
+    print(f"DEBUG Dashboard - Category stats count: {category_stats.count()}")
+    for cat in category_stats:
+        print(f"DEBUG Dashboard - Category {cat.name}: {cat.total_tickets} tickets")
+    
     # Estadísticas de los últimos 7 días
     seven_days_ago = timezone.now() - timedelta(days=7)
     weekly_stats = ParkingTicket.objects.filter(
@@ -430,23 +485,46 @@ def dashboard(request):
         total_income=Sum('amount_paid')
     )
     
+    # Si no hay estadísticas semanales, usar todos los tickets
+    if not weekly_stats['total_entries']:
+        weekly_stats = ParkingTicket.objects.filter(tenant=tenant).aggregate(
+            total_entries=Count('id'),
+            total_completed=Count('id', filter=Q(exit_time__isnull=False)),
+            total_income=Sum('amount_paid')
+        )
+    
+    print(f"DEBUG Dashboard - Weekly stats: {weekly_stats}")
+    print(f"DEBUG Dashboard - Seven days ago: {seven_days_ago}")
+    
+    # Calcular ingresos por categoría de forma más simple
+    category_list = []
+    for cat in category_stats:
+        revenue = ParkingTicket.objects.filter(
+            tenant=tenant,
+            category=cat,
+            amount_paid__isnull=False
+        ).aggregate(total=Sum('amount_paid'))['total'] or 0
+        
+        category_list.append({
+            'category__name': cat.name,
+            'count': cat.total_tickets,
+            'revenue': revenue
+        })
+        print(f"DEBUG Dashboard - Category {cat.name}: {cat.total_tickets} tickets, ${revenue} revenue")
+
     # Preparar estadísticas para el template
     stats = {
         'daily': {
             'total_vehicles': weekly_stats['total_entries'] or 0,
+            'total_income': today_income,  # Ingresos de hoy
             'total_revenue': weekly_stats['total_income'] or 0,
         },
         'active_vehicles': active_tickets,
         'active_vehicles_list': active_vehicles,
-        'category': [
-            {
-                'category__name': cat.name,
-                'count': cat.total_tickets,
-                'revenue': 0  # Calcularemos esto si es necesario
-            }
-            for cat in category_stats
-        ]
+        'category': category_list
     }
+    
+    print(f"DEBUG Dashboard - Final stats: {stats}")
     
     # Estadísticas diarias (últimos 7 días)
     daily_stats = []
@@ -474,6 +552,10 @@ def dashboard(request):
         'daily_stats': daily_stats,
         'current_time': timezone.now(),
         'show_apertura_alert': show_apertura_alert,
+        'active_vehicles_count': active_tickets,  # Para la tarjeta de vehículos activos
+        'available_spaces': 'N/A',  # Espacios disponibles (puedes configurar esto según tu lógica)
+        'active_vehicles': active_vehicles,  # Lista de vehículos activos para la tabla
+        'category_stats': category_stats,  # Estadísticas por categoría
     }
     
     return render(request, 'parking/dashboard.html', context)

@@ -1,224 +1,190 @@
 {% extends 'parking/base.html' %}
 {% load static %}
+{% load parking_tags %}
+
+{% block page_title %}<i class="fas fa-tags mr-3"></i>Categorías de Vehículos{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Subtitle -->
+    <div class="mb-8">
+        <p class="text-gray-600">Gestiona las categorías y tarifas de estacionamiento</p>
+    </div>
     <!-- Mensajes de alerta -->
     {% if messages %}
-    {% for message in messages %}
-    <div
-        class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% endif %}">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                {% if message.tags == 'success' %}
-                <i class="fas fa-check-circle text-green-400"></i>
-                {% elif message.tags == 'error' %}
-                <i class="fas fa-exclamation-circle text-red-400"></i>
-                {% endif %}
-            </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium">{{ message }}</p>
-            </div>
+        <div class="mb-6">
+            {% for message in messages %}
+                <div class="rounded-lg p-4 {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle text-green-400"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle text-red-400"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    </div>
-    {% endfor %}
     {% endif %}
 
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <!-- Header -->
-        <div class="p-4 md:p-6 bg-gradient-to-r from-blue-600 to-blue-800">
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-                <div class="flex items-center space-x-3">
-                    <i class="fas fa-tags text-white text-xl md:text-2xl"></i>
-                    <div>
-                        <h2 class="text-xl md:text-2xl font-bold text-white">Categorías de Vehículos</h2>
-                        <p class="text-blue-100 text-xs md:text-sm">Gestione las categorías y tarifas</p>
-                    </div>
-                </div>
-                <a href="{% url 'category-create' %}"
-                    class="inline-flex items-center justify-center px-3 md:px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-200 font-medium shadow-sm text-sm md:text-base">
-                    <i class="fas fa-plus mr-2"></i>
-                    <span class="hidden sm:inline">Nueva Categoría</span>
-                    <span class="sm:hidden">Nueva</span>
-                </a>
+    <!-- Botón para crear nueva categoría -->
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <a href="{% url 'category-create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center">
+            <i class="fas fa-plus mr-2"></i>Nueva Categoría
+        </a>
+        <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-gray-800 transition-colors inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i>Volver al Dashboard
+        </a>
+    </div>
+
+    <!-- Lista de categorías -->
+    {% if object_list %}
+        <!-- Vista de escritorio -->
+        <div class="hidden md:block bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-list mr-2"></i>
+                    Categorías Configuradas
+                </h3>
             </div>
-        </div>
-
-        <!-- Table Container -->
-        <div class="p-3 md:p-6">
-            <!-- Mobile Cards (visible on small screens) -->
-            <div class="block md:hidden space-y-4">
-                {% for category in object_list %}
-                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center space-x-3">
-                            <div
-                                class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                                <i class="fas fa-tag text-sm"></i>
-                            </div>
-                            <h3 class="text-sm font-medium text-gray-900">{{ category.name }}</h3>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2 mb-4">
-                        <div class="flex justify-between text-xs">
-                            <span class="text-gray-600">Primera hora:</span>
-                            <span class="text-green-600 font-medium">${{ category.first_hour_rate|floatformat:0 }}</span>
-                        </div>
-                        <div class="flex justify-between text-xs">
-                            <span class="text-gray-600">Hora adicional:</span>
-                            <span class="text-blue-600 font-medium">${{ category.additional_hour_rate|floatformat:0 }}</span>
-                        </div>
-                        {% if category.is_monthly %}
-                        <div class="flex justify-between text-xs">
-                            <span class="text-gray-600">Tarifa mensual:</span>
-                            <span class="text-purple-600 font-medium">${{ category.monthly_rate|floatformat:0 }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="flex space-x-2">
-                        <a href="{% url 'category-edit' pk=category.id %}"
-                            class="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200">
-                            <i class="fas fa-edit mr-1"></i>
-                            Editar
-                        </a>
-                        <button onclick="deleteCategory('{{ category.id }}')"
-                            class="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs rounded-md bg-red-50 text-red-700 hover:bg-red-100 transition-colors duration-200">
-                            <i class="fas fa-trash-alt mr-1"></i>
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-8">
-                    <i class="fas fa-folder-open text-gray-400 text-3xl mb-4"></i>
-                    <p class="text-gray-500 text-sm">No hay categorías disponibles</p>
-                    <a href="{% url 'category-create' %}"
-                        class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-                        <i class="fas fa-plus mr-2"></i>
-                        Crear primera categoría
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Desktop Table (hidden on small screens) -->
-            <div class="hidden md:block overflow-x-auto rounded-lg border border-gray-200">
+            <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col"
-                                class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <i class="fas fa-tag text-gray-400"></i>
-                                    <span>Nombre</span>
-                                </div>
-                            </th>
-                            <th scope="col"
-                                class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <i class="fas fa-dollar-sign text-gray-400"></i>
-                                    <span>Tarifas</span>
-                                </div>
-                            </th>
-                            <th scope="col"
-                                class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <i class="fas fa-calendar-alt text-gray-400"></i>
-                                    <span>Mensual</span>
-                                </div>
-                            </th>
-                            <th scope="col"
-                                class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 lg:w-48">
-                                <div class="flex items-center space-x-2">
-                                    <i class="fas fa-cog text-gray-400"></i>
-                                    <span>Acciones</span>
-                                </div>
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Primera Hora</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora Adicional</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mensual</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         {% for category in object_list %}
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div
-                                        class="flex-shrink-0 h-8 w-8 lg:h-10 lg:w-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                                        <i class="fas fa-tag text-sm lg:text-base"></i>
-                                    </div>
-                                    <div class="ml-3 lg:ml-4">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                            <i class="fas fa-tag text-blue-600"></i>
+                                        </div>
                                         <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-4 lg:px-6 py-4">
-                                <div class="space-y-1">
-                                    <div class="flex items-center text-xs lg:text-sm text-gray-700">
-                                        <span class="font-medium">Primera hora:</span>
-                                        <span class="ml-2 text-green-600">${{ category.first_hour_rate|floatformat:0 }}</span>
-                                    </div>
-                                    <div class="flex items-center text-xs lg:text-sm text-gray-700">
-                                        <span class="font-medium">Hora adicional:</span>
-                                        <span class="ml-2 text-blue-600">${{ category.additional_hour_rate|floatformat:0 }}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 lg:px-6 py-4">
-                                <div class="space-y-1">
-                                    <div class="flex items-center text-xs lg:text-sm text-gray-700">
-                                        <span class="font-medium">¿Mensual?:</span>
-                                        <span
-                                            class="ml-2 {% if category.is_monthly %}text-green-600{% else %}text-gray-500{% endif %}">
-                                            {{ category.is_monthly|yesno:"Sí,No" }}
-                                        </span>
-                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-semibold text-green-600">
+                                        {{ category.first_hour_rate|format_currency:request.tenant }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-semibold text-blue-600">
+                                        {{ category.additional_hour_rate|format_currency:request.tenant }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
                                     {% if category.is_monthly %}
-                                    <div class="flex items-center text-xs lg:text-sm text-gray-700">
-                                        <span class="font-medium">Tarifa:</span>
-                                        <span class="ml-2 text-purple-600">${{ category.monthly_rate|floatformat:0 }}</span>
-                                    </div>
+                                        <div>
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                <i class="fas fa-check mr-1"></i>Sí
+                                            </span>
+                                            <div class="text-sm text-purple-600 font-semibold mt-1">
+                                                {{ category.monthly_rate|format_currency:request.tenant }}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            <i class="fas fa-times mr-1"></i>No
+                                        </span>
                                     {% endif %}
-                                </div>
-                            </td>
-                            <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm">
-                                <div
-                                    class="flex flex-col lg:flex-row items-stretch lg:items-center space-y-2 lg:space-y-0 lg:space-x-2">
-                                    <a href="{% url 'category-edit' pk=category.id %}"
-                                        class="inline-flex items-center justify-center px-2 lg:px-3 py-1 text-xs rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors duration-200">
-                                        <i class="fas fa-edit mr-1"></i>
-                                        <span class="hidden lg:inline">Editar</span>
-                                        <span class="lg:hidden">Edit</span>
-                                    </a>
-                                    <button onclick="deleteCategory('{{ category.id }}')"
-                                        class="inline-flex items-center justify-center px-2 lg:px-3 py-1 text-xs rounded-md bg-red-50 text-red-700 hover:bg-red-100 transition-colors duration-200">
-                                        <i class="fas fa-trash-alt mr-1"></i>
-                                        <span class="hidden lg:inline">Eliminar</span>
-                                        <span class="lg:hidden">Del</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center">
-                                    <i class="fas fa-folder-open text-gray-400 text-4xl mb-4"></i>
-                                    <p class="text-gray-500 text-lg">No hay categorías disponibles</p>
-                                    <a href="{% url 'category-create' %}"
-                                        class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                        <i class="fas fa-plus mr-2"></i>
-                                        Crear primera categoría
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <a href="{% url 'category-edit' pk=category.id %}" 
+                                           class="text-blue-600 hover:text-blue-900 p-1 rounded" 
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'category-delete' pk=category.id %}" 
+                                           class="text-red-600 hover:text-red-900 p-1 rounded" 
+                                           title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+
+        <!-- Vista móvil -->
+        <div class="md:hidden grid grid-cols-1 gap-4">
+            {% for category in object_list %}
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-tag text-blue-600"></i>
+                        </div>
+                        <h3 class="ml-3 text-lg font-semibold text-gray-900">{{ category.name }}</h3>
+                    </div>
+                    
+                    <div class="space-y-3 mb-4">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Primera hora:</span>
+                            <span class="text-sm font-semibold text-green-600">{{ category.first_hour_rate|format_currency:request.tenant }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Hora adicional:</span>
+                            <span class="text-sm font-semibold text-blue-600">{{ category.additional_hour_rate|format_currency:request.tenant }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Mensual:</span>
+                            {% if category.is_monthly %}
+                                <div class="text-right">
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check mr-1"></i>Sí
+                                    </span>
+                                    <div class="text-sm text-purple-600 font-semibold mt-1">
+                                        {{ category.monthly_rate|format_currency:request.tenant }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    <i class="fas fa-times mr-1"></i>No
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <a href="{% url 'category-edit' pk=category.id %}" 
+                           class="flex-1 text-center bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-edit mr-2"></i>Editar
+                        </a>
+                        <a href="{% url 'category-delete' pk=category.id %}" 
+                           class="flex-1 text-center border border-red-600 text-red-600 py-2 px-4 rounded-lg hover:bg-red-50 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Eliminar
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <i class="fas fa-tags text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay categorías configuradas</h3>
+            <p class="text-gray-500 mb-6">Crea tu primera categoría de vehículo para comenzar</p>
+            <a href="{% url 'category-create' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center">
+                <i class="fas fa-plus mr-2"></i>Crear Primera Categoría
+            </a>
+        </div>
+    {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

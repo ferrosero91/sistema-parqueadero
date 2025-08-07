@@ -16,6 +16,15 @@ from parking.views import (
     user_roles, user_permissions, permissions_overview, access_log
 )
 
+# Importar vistas de configuración
+from parking.views_config import (
+    configuration_dashboard, quick_setup,
+    CurrencyListView, CurrencyCreateView, CurrencyUpdateView, CurrencyDeleteView,
+    TaxTypeListView, TaxTypeCreateView, TaxTypeUpdateView, TaxTypeDeleteView,
+    tenant_configuration, toggle_currency_status, toggle_tax_type_status,
+    set_default_currency, set_default_tax_type
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.pagina_inicial, name='pagina_inicial'),
@@ -84,3 +93,31 @@ urlpatterns += [
     path('caja/cierre/', cierre_turno, name='cierre_turno'),
     path('caja/historial/', historial_cuadre_caja, name='historial_cuadre_caja'),
 ]
+
+# URLs de configuración
+urlpatterns += [
+    # Dashboard de configuración
+    path('configuracion/', configuration_dashboard, name='config-dashboard'),
+    path('configuracion/dashboard/', configuration_dashboard, name='config_dashboard'),  # Alias
+    path('configuracion/setup/', quick_setup, name='quick-setup'),
+    path('configuracion/empresa/', tenant_configuration, name='tenant-configuration'),
+    
+    # Gestión de monedas
+    path('configuracion/monedas/', CurrencyListView.as_view(), name='currency-list'),
+    path('configuracion/monedas/crear/', CurrencyCreateView.as_view(), name='currency-create'),
+    path('configuracion/monedas/<int:pk>/editar/', CurrencyUpdateView.as_view(), name='currency-edit'),
+    path('configuracion/monedas/<int:pk>/eliminar/', CurrencyDeleteView.as_view(), name='currency-delete'),
+    
+    # Gestión de tipos de impuestos
+    path('configuracion/impuestos/', TaxTypeListView.as_view(), name='tax-type-list'),
+    path('configuracion/impuestos/crear/', TaxTypeCreateView.as_view(), name='tax-type-create'),
+    path('configuracion/impuestos/<int:pk>/editar/', TaxTypeUpdateView.as_view(), name='tax-type-edit'),
+    path('configuracion/impuestos/<int:pk>/eliminar/', TaxTypeDeleteView.as_view(), name='tax-type-delete'),
+    
+    # AJAX endpoints
+    path('api/currency/<int:pk>/toggle-status/', toggle_currency_status, name='toggle-currency-status'),
+    path('api/currency/<int:pk>/set-default/', set_default_currency, name='set-default-currency'),
+    path('api/tax-type/<int:pk>/toggle-status/', toggle_tax_type_status, name='toggle-tax-type-status'),
+    path('api/tax-type/<int:pk>/set-default/', set_default_tax_type, name='set-default-tax-type'),
+]
+

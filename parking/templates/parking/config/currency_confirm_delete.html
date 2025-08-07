@@ -1,0 +1,104 @@
+{% extends 'parking/base.html' %}
+
+{% block title %}Eliminar Moneda{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-trash mr-3"></i>Eliminar Moneda</h1>
+    <p class="text-gray-600 mt-2">Confirma la eliminación de la moneda</p>
+</div>
+
+<div class="content-body">
+    <div class="max-w-2xl mx-auto">
+        <div class="card border-red-200">
+            <div class="card-header bg-red-50">
+                <h3 class="text-lg font-semibold text-red-800">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Confirmar Eliminación
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-6">
+                    <p class="text-gray-700 mb-4">
+                        ¿Estás seguro de que deseas eliminar la siguiente moneda?
+                    </p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 border">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">Nombre:</span>
+                                <div class="font-semibold">{{ object.name }}</div>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">Código:</span>
+                                <div class="font-mono">{{ object.code }}</div>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">Símbolo:</span>
+                                <div class="font-mono text-lg">{{ object.symbol }}</div>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">Decimales:</span>
+                                <div>{{ object.decimal_places }}</div>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">Estado:</span>
+                                <div>
+                                    {% if object.is_active %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                            Activa
+                                        </span>
+                                    {% else %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                                            Inactiva
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">Por Defecto:</span>
+                                <div>
+                                    {% if object.is_default %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                            Sí
+                                        </span>
+                                    {% else %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                                            No
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-semibold mb-1">Advertencia:</p>
+                                <p>Esta acción no se puede deshacer. Si esta moneda está siendo utilizada en tickets o configuraciones, la eliminación podría afectar el funcionamiento del sistema.</p>
+                                {% if object.is_default %}
+                                    <p class="mt-2 font-semibold">Esta es la moneda por defecto del sistema. Asegúrate de establecer otra moneda como por defecto antes de eliminar esta.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" class="flex gap-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash mr-2"></i>
+                        Sí, Eliminar Moneda
+                    </button>
+                    <a href="{% url 'currency-list' %}" class="btn bg-gray-500 text-white hover:bg-gray-600">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

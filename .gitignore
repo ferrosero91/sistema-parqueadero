@@ -4,12 +4,36 @@
 __pycache__
 db.sqlite3
 
+# Variables de entorno
+.env
+.env.local
+.env.production
+.env.staging
 
 # Environments 
-.env 
 .venv 
 env/ 
 venv/ 
 ENV/ 
 env.bak/ 
-venv.bak/ 
+venv.bak/
+
+# Logs
+logs/*.log
+logs/*.log.*
+
+# Media files (opcional, dependiendo de tu estrategia)
+media/
+
+# Static files collected
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db 

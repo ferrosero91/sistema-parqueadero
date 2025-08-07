@@ -1,0 +1,174 @@
+{% extends 'parking/base.html' %}
+
+{% block title %}Configuración General{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-cog mr-3"></i>Configuración General</h1>
+    <p class="text-gray-600 mt-2">Ajusta las preferencias generales de tu empresa</p>
+</div>
+
+<div class="content-body">
+    <div class="max-w-4xl mx-auto">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Configuración de Moneda e Impuestos -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-lg font-semibold">
+                        <i class="fas fa-money-bill mr-2"></i>
+                        Configuración Financiera
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.default_currency.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.default_currency.label }}
+                            </label>
+                            {{ form.default_currency }}
+                            {% if form.default_currency.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.default_currency.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.default_tax_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.default_tax_type.label }}
+                            </label>
+                            {{ form.default_tax_type }}
+                            {% if form.default_tax_type.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.default_tax_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 space-y-3">
+                        <div class="flex items-center">
+                            {{ form.apply_tax_by_default }}
+                            <label for="{{ form.apply_tax_by_default.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ form.apply_tax_by_default.label }}
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {{ form.include_tax_in_ticket }}
+                            <label for="{{ form.include_tax_in_ticket.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ form.include_tax_in_ticket.label }}
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {{ form.show_tax_breakdown }}
+                            <label for="{{ form.show_tax_breakdown.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ form.show_tax_breakdown.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Formato -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-lg font-semibold">
+                        <i class="fas fa-format-list-numbered mr-2"></i>
+                        Formato de Números
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.thousand_separator.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.thousand_separator.label }}
+                            </label>
+                            {{ form.thousand_separator }}
+                            {% if form.thousand_separator.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.thousand_separator.errors.0 }}</div>
+                            {% endif %}
+                            <div class="text-xs text-gray-500 mt-1">
+                                Ej: "," para 1,000 o "." para 1.000
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.decimal_separator.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.decimal_separator.label }}
+                            </label>
+                            {{ form.decimal_separator }}
+                            {% if form.decimal_separator.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.decimal_separator.errors.0 }}</div>
+                            {% endif %}
+                            <div class="text-xs text-gray-500 mt-1">
+                                Ej: "." para 10.50 o "," para 10,50
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Empresa -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-lg font-semibold">
+                        <i class="fas fa-building mr-2"></i>
+                        Información de la Empresa
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.company_logo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.company_logo.label }}
+                            </label>
+                            {{ form.company_logo }}
+                            {% if form.company_logo.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.company_logo.errors.0 }}</div>
+                            {% endif %}
+                            <div class="text-xs text-gray-500 mt-1">
+                                Logo que aparecerá en los tickets
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.timezone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.timezone.label }}
+                            </label>
+                            {{ form.timezone }}
+                            {% if form.timezone.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.timezone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label for="{{ form.receipt_footer_text.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.receipt_footer_text.label }}
+                        </label>
+                        {{ form.receipt_footer_text }}
+                        {% if form.receipt_footer_text.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.receipt_footer_text.errors.0 }}</div>
+                        {% endif %}
+                        <div class="text-xs text-gray-500 mt-1">
+                            Texto que aparecerá al final de los tickets
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex gap-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar Configuración
+                </button>
+                <a href="{% url 'config-dashboard' %}" class="btn bg-gray-500 text-white hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Volver al Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

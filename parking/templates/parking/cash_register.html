@@ -1,19 +1,28 @@
 {% extends 'parking/base.html' %}
 {% load humanize %}
 
+{% block page_title %}<i class="fas fa-cash-register mr-3"></i>Cuadre de Caja{% endblock %}
+
 {% block content %}
-<div class="p-6 space-y-6">
-    <!-- Header con título y selector de fechas -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-    
-            <div class="flex items-center mt-2">
-                <p class="text-sm text-gray-600 mr-2">Período:</p>
-                <input type="text" id="date_range" class="text-sm text-gray-600 border rounded-md px-2 py-1" value="{{ start_date|date:'Y-m-d' }} - {{ end_date|date:'Y-m-d' }}">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Cuadre de Caja</h1>
+        <p class="mt-2 text-gray-600">Gestiona los turnos y movimientos de caja del parqueadero</p>
+    </div>
+
+    <!-- Header con selector de fechas -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <div class="flex items-center">
+                    <p class="text-sm text-gray-600 mr-2">Período:</p>
+                    <input type="text" id="date_range" class="text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2" value="{{ start_date|date:'Y-m-d' }} - {{ end_date|date:'Y-m-d' }}">
+                </div>
+                {% if start_date != today %}
+                <p class="text-sm text-red-600 mt-2">Nota: Estás viendo un período diferente al día actual ({{ today|date:"d/m/Y" }}).</p>
+                {% endif %}
             </div>
-            {% if start_date != today %}
-            <p class="text-sm text-red-600 mt-1">Nota: Estás viendo un período diferente al día actual ({{ today|date:"d/m/Y" }}).</p>
-            {% endif %}
         </div>
     </div>
 

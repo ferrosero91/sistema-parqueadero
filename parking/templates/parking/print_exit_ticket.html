@@ -1,3 +1,4 @@
+{% load parking_tags %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,8 +26,24 @@
            margin-bottom: 10px;
            font-size: 10px;
        }
+       .company-logo {
+           text-align: center;
+           margin-bottom: 5px;
+       }
+       .company-logo img {
+           max-width: 40mm;
+           max-height: 15mm;
+           object-fit: contain;
+       }
        .ticket-info {
            margin: 5px 0;
+       }
+       .payment-breakdown {
+           margin: 5px 0;
+           padding: 3px 0;
+           border-top: 1px dotted black;
+           border-bottom: 1px dotted black;
+           font-size: 11px;
        }
        .barcode {
            text-align: center;
@@ -42,16 +59,34 @@
            border-top: 1px dotted black;
            border-bottom: 1px dotted black;
        }
+       .footer-text {
+           text-align: center;
+           font-size: 9px;
+           margin-top: 5px;
+       }
    </style>
 </head>
 <body>
    <div class="header">
+       {% if company_logo %}
+       <div class="company-logo">
+           <img src="{{ company_logo }}" alt="Logo">
+       </div>
+       {% endif %}
+       
        <div class="company-info">
-           <strong>{{ parking_lot.empresa }}</strong><br>
-           {{ parking_lot.empresa }}<br>
-           NIT: {{ parking_lot.nit }}<br>
-           Tel: {{ parking_lot.telefono }}<br>
-           {{ parking_lot.direccion }}
+           <strong>{% if current_tenant %}{{ current_tenant.name }}{% else %}{{ parking_lot.empresa }}{% endif %}</strong><br>
+           {% if current_tenant %}
+               {{ current_tenant.name }}<br>
+               {% if current_tenant.nit %}NIT: {{ current_tenant.nit }}<br>{% endif %}
+               {% if current_tenant.phone %}Tel: {{ current_tenant.phone }}<br>{% endif %}
+               {% if current_tenant.address %}{{ current_tenant.address }}{% endif %}
+           {% else %}
+               {{ parking_lot.empresa }}<br>
+               NIT: {{ parking_lot.nit }}<br>
+               Tel: {{ parking_lot.telefono }}<br>
+               {{ parking_lot.direccion }}
+           {% endif %}
        </div>
        <h1 style="font-size: 10px; margin: 5px 0;">TICKET DE SALIDA</h1>
    </div>
@@ -63,9 +98,23 @@
        Entrada: {{ ticket.entry_time|date:"d/m/Y H:i" }}<br>
        Salida: {{ ticket.exit_time|date:"d/m/Y H:i" }}<br>
        Tiempo: {{ ticket.get_duration }} horas<br>
-       Total a Pagar: ${{ ticket.amount_paid|floatformat:2 }}<br>
-       Pagó con: ${{ amount_received|floatformat:2 }}<br>
-       Vuelto: ${{ change|floatformat:2 }}
+       {% if forma_pago %}Forma de Pago: {{ forma_pago }}<br>{% endif %}
+   </div>
+
+   <!-- Desglose de pago con impuestos -->
+   <div class="payment-breakdown">
+       {% tax_calculation_info ticket.amount_paid request.tenant as tax_info %}
+       {% if tax_info.has_tax %}
+           Subtotal: {{ tax_info.subtotal|format_currency:request.tenant }}<br>
+           {{ tax_info.tax_name }} ({{ tax_info.tax_rate }}%): {{ tax_info.tax_amount|format_currency:request.tenant }}<br>
+           <strong>Total: {{ tax_info.total_amount|format_currency:request.tenant }}</strong><br>
+       {% else %}
+           <strong>Total: {{ ticket.amount_paid|format_currency:request.tenant }}</strong><br>
+       {% endif %}
+       {% if amount_received %}
+           Pagó con: {{ amount_received|format_currency:request.tenant }}<br>
+           Vuelto: {{ change|format_currency:request.tenant }}
+       {% endif %}
    </div>
 
    {% if ticket.category.name|upper == 'MOTOS' and ticket.cascos %}
@@ -87,7 +136,11 @@
    </div>
    
    <div style="text-align: center; border-top: 1px dashed black; padding-top: 5px; font-size: 10px;">
-       Gracias por su visita
+       {% if tenant_config.receipt_footer_text %}
+           {{ tenant_config.receipt_footer_text }}
+       {% else %}
+           Gracias por su visita
+       {% endif %}
    </div>
 
    <script>

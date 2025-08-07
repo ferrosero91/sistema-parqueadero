@@ -1,71 +1,85 @@
-# Fase 1: Builder
-FROM python:3.11-slim AS builder
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --user -r requirements.txt
-
-# Fase 2: Contenedor final
+# Usar Python 3.11 slim como imagen base
 FROM python:3.11-slim
+
+# Establecer variables de entorno
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crear directorio de trabajo
 WORKDIR /app
 
-# Crear usuario sin privilegios
-RUN useradd -m myuser
+# Copiar requirements y instalar dependencias de Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar dependencias
-COPY --from=builder /root/.local /home/myuser/.local
-
-# Copiar el proyecto
+# Copiar el código de la aplicación
 COPY . .
 
-# Crear carpetas necesarias
-RUN mkdir -p /app/static /app/staticfiles /app/media && \
-    chown -R myuser:myuser /app
+# Crear directorios necesarios
+RUN mkdir -p /app/static /app/staticfiles /app/media
 
-# Establecer PATH y permisos
-ENV PATH="/home/myuser/.local/bin:$PATH"
-USER myuser
-
-# Variables de entorno para superusuario
+# Variables de entorno por defecto para el superusuario
 ENV DJANGO_SUPERUSER_USERNAME=admin
-ENV DJANGO_SUPERUSER_EMAIL=admin@example.com
-ENV DJANGO_SUPERUSER_PASSWORD=Admin123
+ENV DJANGO_SUPERUSER_EMAIL=admin@parqueadero.com
+ENV DJANGO_SUPERUSER_PASSWORD=admin123
 
-# Crear script de inicio
+# Crear script de inicio optimizado
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-echo "Starting Django application..."\n\
+echo "🚀 Iniciando aplicación Django..."\n\
+\n\
+# Verificar conexión a la base de datos\n\
+echo "🔍 Verificando conexión a la base de datos..."\n\
+python manage.py check --database default\n\
 \n\
 # Aplicar migraciones\n\
-echo "Applying migrations..."\n\
+echo "📦 Aplicando migraciones..."\n\
 python manage.py migrate --noinput\n\
 \n\
 # Recopilar archivos estáticos\n\
-echo "Collecting static files..."\n\
-python manage.py collectstatic --noinput\n\
+echo "📁 Recopilando archivos estáticos..."\n\
+python manage.py collectstatic --noinput --clear\n\
 \n\
-# Crear superusuario solo si no existe\n\
-echo "Creating superuser if not exists..."\n\
-python manage.py shell << EOF\n\
+# Crear superusuario si no existe\n\
+echo "👤 Verificando superusuario..."\n\
+python manage.py shell -c "\n\
 from django.contrib.auth.models import User\n\
-if not User.objects.filter(username="$DJANGO_SUPERUSER_USERNAME").exists():\n\
-    User.objects.create_superuser("$DJANGO_SUPERUSER_USERNAME", "$DJANGO_SUPERUSER_EMAIL", "$DJANGO_SUPERUSER_PASSWORD")\n\
-    print("Superuser created successfully")\n\
+import os\n\
+username = os.environ.get(\"DJANGO_SUPERUSER_USERNAME\", \"admin\")\n\
+email = os.environ.get(\"DJANGO_SUPERUSER_EMAIL\", \"admin@parqueadero.com\")\n\
+password = os.environ.get(\"DJANGO_SUPERUSER_PASSWORD\", \"admin123\")\n\
+if not User.objects.filter(username=username).exists():\n\
+    User.objects.create_superuser(username, email, password)\n\
+    print(f\"✅ Superusuario creado: {username}\")\n\
 else:\n\
-    print("Superuser already exists")\n\
-EOF\n\
+    print(f\"ℹ️  Superusuario ya existe: {username}\")\n\
+"\n\
 \n\
-echo "Starting Gunicorn server..."\n\
+echo "🌐 Iniciando servidor Gunicorn..."\n\
 exec gunicorn parking_system.wsgi:application \\\n\
     --bind 0.0.0.0:8081 \\\n\
     --workers 3 \\\n\
+    --worker-class sync \\\n\
     --timeout 120 \\\n\
+    --keep-alive 5 \\\n\
+    --max-requests 1000 \\\n\
+    --max-requests-jitter 100 \\\n\
     --access-logfile - \\\n\
-    --error-logfile -\n\
+    --error-logfile - \\\n\
+    --log-level info\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
-# Exponer puerto
+# Exponer puerto 8081
 EXPOSE 8081
 
 # Comando de inicio

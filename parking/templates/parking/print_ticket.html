@@ -1,3 +1,4 @@
+{% load parking_tags %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,8 +26,24 @@
            margin-bottom: 10px;
            font-size: 10px;
        }
+       .company-logo {
+           text-align: center;
+           margin-bottom: 5px;
+       }
+       .company-logo img {
+           max-width: 40mm;
+           max-height: 15mm;
+           object-fit: contain;
+       }
        .ticket-info {
            margin: 5px 0;
+       }
+       .rates-info {
+           margin: 5px 0;
+           padding: 3px 0;
+           border-top: 1px dotted black;
+           border-bottom: 1px dotted black;
+           font-size: 10px;
        }
        .barcode {
            text-align: center;
@@ -42,16 +59,34 @@
            border-top: 1px dotted black;
            border-bottom: 1px dotted black;
        }
+       .footer-text {
+           text-align: center;
+           font-size: 9px;
+           margin-top: 5px;
+       }
    </style>
 </head>
 <body>
    <div class="header">
+       {% if company_logo %}
+       <div class="company-logo">
+           <img src="{{ company_logo }}" alt="Logo">
+       </div>
+       {% endif %}
+       
        <div class="company-info">
-           <strong style="font-size:16px;">{{ tenant.name }}</strong><br>
-           NIT: {{ tenant.nit }}<br>
-           Tel: {{ tenant.telefono }}<br>
-           {{ tenant.direccion }}<br>
-           {{ tenant.email }}
+           <strong style="font-size:16px;">{% if current_tenant %}{{ current_tenant.name }}{% else %}{{ tenant.name }}{% endif %}</strong><br>
+           {% if current_tenant %}
+               {% if current_tenant.nit %}NIT: {{ current_tenant.nit }}<br>{% endif %}
+               {% if current_tenant.phone %}Tel: {{ current_tenant.phone }}<br>{% endif %}
+               {% if current_tenant.address %}{{ current_tenant.address }}<br>{% endif %}
+               {% if current_tenant.email %}{{ current_tenant.email }}{% endif %}
+           {% else %}
+               NIT: {{ tenant.nit }}<br>
+               Tel: {{ tenant.telefono }}<br>
+               {{ tenant.direccion }}<br>
+               {{ tenant.email }}
+           {% endif %}
        </div>
        <h1 style="font-size: 10px; margin: 5px 0;">TICKET DE ESTACIONAMIENTO</h1>
    </div>
@@ -61,6 +96,19 @@
        Placa: {{ ticket.placa }}<br>
        Categoría: {{ ticket.category.name }}<br>
        Entrada: {{ ticket.entry_time|date:"d/m/Y H:i" }}
+   </div>
+
+   <!-- Información de tarifas -->
+   <div class="rates-info">
+       <strong>TARIFAS:</strong><br>
+       1ra Hora: {{ ticket.category.first_hour_rate|format_currency:request.tenant }}<br>
+       Hora Adicional: {{ ticket.category.additional_hour_rate|format_currency:request.tenant }}<br>
+       {% if ticket.category.monthly_rate %}
+       Mensual: {{ ticket.category.monthly_rate|format_currency:request.tenant }}<br>
+       {% endif %}
+       {% if tax_enabled %}
+       <small>* Precios incluyen {{ default_tax.name }} ({{ tax_rate }}%)</small>
+       {% endif %}
    </div>
 
    {% if ticket.category.name|upper == 'MOTOS' and ticket.cascos %}
@@ -82,7 +130,11 @@
    </div>
    
    <div style="text-align: center; border-top: 1px dashed black; padding-top: 5px; font-size: 10px;">
-       Gracias por su visita
+       {% if tenant_config.receipt_footer_text %}
+           {{ tenant_config.receipt_footer_text }}
+       {% else %}
+           Gracias por su visita
+       {% endif %}
    </div>
 
    <script>
