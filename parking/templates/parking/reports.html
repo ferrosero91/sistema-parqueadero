@@ -4,27 +4,36 @@
 {% block page_title %}<i class="fas fa-chart-bar mr-3"></i>Reportes de Ingresos{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
     <!-- Subtitle -->
-    <div class="mb-8">
-        <p class="text-gray-600">Resumen profesional de ingresos y movimientos del parqueadero</p>
+    <div class="mb-4 sm:mb-6 lg:mb-8">
+        <p class="text-gray-600 text-sm sm:text-base">Resumen profesional de ingresos y movimientos del parqueadero</p>
     </div>
 
     <!-- Encabezado y acciones -->
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">
         <div class="flex flex-col sm:flex-row gap-2">
-            <a href="?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&export=excel" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm md:text-base">
-                <i class="fas fa-file-excel text-sm md:text-base"></i>
+            <a href="?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&export=excel"
+                class="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm sm:text-base">
+                <i class="fas fa-file-excel"></i>
                 <span class="hidden sm:inline">Exportar Excel</span>
                 <span class="sm:hidden">Excel</span>
             </a>
-            <a href="?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&export=pdf" target="_blank" rel="noopener" class="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm md:text-base">
-                <i class="fas fa-file-pdf text-sm md:text-base"></i>
+            <a href="?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&export=pdf"
+                target="_blank" rel="noopener"
+                class="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm sm:text-base">
+                <i class="fas fa-file-pdf"></i>
                 <span class="hidden sm:inline">Exportar PDF</span>
                 <span class="sm:hidden">PDF</span>
             </a>
         </div>
-    </div>
+        <div class="flex gap-2">
+            <a href="{% url 'dashboard' %}"
+                class="bg-gray-100 text-gray-700 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base">
+                <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">Volver</span>
+            </a>
+        </div>
     </div>
 
     <!-- Filtros -->
@@ -33,26 +42,33 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-auto gap-4 lg:gap-4 flex-1">
                 <div class="flex flex-col gap-1">
                     <label class="block text-xs md:text-sm font-medium text-gray-700">Fecha Inicio</label>
-                    <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm md:text-base input-mobile">
+                    <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}"
+                        class="mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm md:text-base input-mobile">
                 </div>
                 <div class="flex flex-col gap-1">
                     <label class="block text-xs md:text-sm font-medium text-gray-700">Fecha Fin</label>
-                    <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm md:text-base input-mobile">
+                    <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}"
+                        class="mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm md:text-base input-mobile">
                 </div>
             </div>
-            
+
             <div class="flex flex-col gap-1">
                 <label class="block text-xs md:text-sm font-medium text-gray-700">Filtro rápido</label>
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex gap-1">
-                    <button type="submit" name="quick_filter" value="hoy" class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'hoy' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Hoy</button>
-                    <button type="submit" name="quick_filter" value="semana" class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'semana' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Semana</button>
-                    <button type="submit" name="quick_filter" value="mes" class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'mes' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Mes</button>
-                    <button type="submit" name="quick_filter" value="anio" class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'anio' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Año</button>
+                    <button type="submit" name="quick_filter" value="hoy"
+                        class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'hoy' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Hoy</button>
+                    <button type="submit" name="quick_filter" value="semana"
+                        class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'semana' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Semana</button>
+                    <button type="submit" name="quick_filter" value="mes"
+                        class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'mes' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Mes</button>
+                    <button type="submit" name="quick_filter" value="anio"
+                        class="px-2 md:px-3 py-1 rounded-lg border text-xs font-semibold transition btn-mobile {% if quick_filter == 'anio' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-blue-100{% endif %}">Año</button>
                 </div>
             </div>
-            
+
             <div class="flex items-end">
-                <button type="submit" class="w-full lg:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 text-sm md:text-base btn-mobile">
+                <button type="submit"
+                    class="w-full lg:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 text-sm md:text-base btn-mobile">
                     Filtrar
                 </button>
             </div>
@@ -63,12 +79,15 @@
     {% if start_date and end_date %}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {% for forma in formas_pago_list %}
-        <div class="{{ forma.color }} text-white p-3 md:p-4 rounded-xl shadow flex flex-col items-center relative group transition-transform hover:scale-105 card-mobile">
+        <div
+            class="{{ forma.color }} text-white p-3 md:p-4 rounded-xl shadow flex flex-col items-center relative group transition-transform hover:scale-105 card-mobile">
             <span class="material-icons text-2xl md:text-3xl mb-1">{{ forma.icono }}</span>
             <h3 class="font-bold text-sm md:text-base">{{ forma.nombre }}</h3>
             <p class="text-lg md:text-xl font-semibold mt-1">${{ forma.valor|floatformat:2 }}</p>
             <div class="text-xs mt-1 opacity-80">{{ forma.porcentaje|floatformat:1 }}%</div>
-            <div class="absolute top-2 right-2 bg-white/20 rounded-full px-2 py-1 text-xs font-bold group-hover:bg-white/40 transition">{{ forma.clave|title }}</div>
+            <div
+                class="absolute top-2 right-2 bg-white/20 rounded-full px-2 py-1 text-xs font-bold group-hover:bg-white/40 transition">
+                {{ forma.clave|title }}</div>
         </div>
         {% endfor %}
     </div>
@@ -107,7 +126,7 @@
         <!-- Estadísticas por categoría -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-4">Por Categoría</h2>
-            
+
             <!-- Mobile Cards (visible on small screens) -->
             <div class="block md:hidden space-y-3">
                 {% for stat in category_stats %}
@@ -144,7 +163,8 @@
                         <tr class="border-t hover:bg-gray-50">
                             <td class="py-3 px-4 text-sm">{{ stat.category__name }}</td>
                             <td class="py-3 px-4 text-sm">{{ stat.count }}</td>
-                            <td class="py-3 px-4 text-sm text-green-600 font-medium">${{ stat.revenue|floatformat:2 }}</td>
+                            <td class="py-3 px-4 text-sm text-green-600 font-medium">${{ stat.revenue|floatformat:2 }}
+                            </td>
                             <td class="py-3 px-4 text-sm">{{ stat.avg_duration|floatformat:1 }} h</td>
                         </tr>
                         {% empty %}
@@ -160,7 +180,7 @@
         <!-- Vehículos frecuentes -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-4">Vehículos Frecuentes</h2>
-            
+
             <!-- Mobile Cards (visible on small screens) -->
             <div class="block md:hidden space-y-3">
                 {% for vehicle in frequent_vehicles %}
@@ -195,7 +215,8 @@
                         <tr class="border-t hover:bg-gray-50">
                             <td class="py-3 px-4 text-sm font-medium">{{ vehicle.placa }}</td>
                             <td class="py-3 px-4 text-sm">{{ vehicle.visits }}</td>
-                            <td class="py-3 px-4 text-sm text-blue-600 font-medium">${{ vehicle.total_spent|floatformat:2 }}</td>
+                            <td class="py-3 px-4 text-sm text-blue-600 font-medium">${{
+                                vehicle.total_spent|floatformat:2 }}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -218,65 +239,65 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {{ daily_stats|json_script:"dailyStats" }}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Gráfico de ingresos diarios (barras)
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const dailyStats = JSON.parse(document.getElementById('dailyStats').textContent);
-    
-    const barChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: dailyStats.map(stat => stat.date),
-            datasets: [{
-                label: 'Ingresos ($)',
-                data: dailyStats.map(stat => stat.revenue),
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgb(59, 130, 246)',
-                borderWidth: 2,
-                borderRadius: 8,
-                maxBarThickness: 40,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                title: {
-                    display: false
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gráfico de ingresos diarios (barras)
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const dailyStats = JSON.parse(document.getElementById('dailyStats').textContent);
+
+        const barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dailyStats.map(stat => stat.date),
+                datasets: [{
+                    label: 'Ingresos ($)',
+                    data: dailyStats.map(stat => stat.revenue),
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    maxBarThickness: 40,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return 'Ingresos: $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Ingresos: $' + context.parsed.y.toLocaleString();
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#374151',
+                            font: { weight: 'bold' },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#e5e7eb' },
+                        ticks: {
+                            callback: function (value) {
+                                return '$' + value.toLocaleString();
+                            },
+                            color: '#374151',
+                            font: { weight: 'bold' }
                         }
                     }
                 }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { 
-                        color: '#374151', 
-                        font: { weight: 'bold' },
-                        maxRotation: 45
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#e5e7eb' },
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        },
-                        color: '#374151',
-                        font: { weight: 'bold' }
-                    }
-                }
             }
-        }
+        });
     });
-});
 </script>
 
 {% endblock %}

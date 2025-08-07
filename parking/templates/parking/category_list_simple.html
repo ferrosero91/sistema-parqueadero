@@ -3,11 +3,11 @@
 {% load humanize %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto p-4">
+<div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
     <!-- Mensajes de alerta -->
     {% if messages %}
     {% for message in messages %}
-    <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% endif %}">
+    <div class="mb-3 mb-md-4 p-3 p-sm-4 rounded-lg text-sm sm:text-base {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% endif %}">
         {{ message }}
     </div>
     {% endfor %}
@@ -15,71 +15,217 @@
 
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Header -->
-        <div class="p-6 bg-gradient-to-r from-blue-600 to-blue-800">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Gestión de Categorías</h2>
-                    <p class="text-blue-100 text-sm">Gestione las categorías y tarifas</p>
+        <div class="p-4 sm:p-6 bg-gradient-to-r from-blue-600 to-blue-800">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                <div class="mb-3 sm:mb-0">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">Gestión de Categorías</h2>
+                    <p class="text-blue-100 text-xs sm:text-sm">Gestione las categorías y tarifas</p>
                 </div>
-                <a href="{% url 'category-create' %}" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
-                    Nueva Categoría
-                </a>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <a href="{% url 'category-create' %}"
+                        class="bg-white text-blue-600 px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-center text-sm sm:text-base">
+                        <i class="fas fa-plus mr-1 sm:mr-2"></i>Nueva Categoría
+                    </a>
+                    <a href="{% url 'dashboard' %}"
+                        class="bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors text-center text-sm sm:text-base">
+                        <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>Volver
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Content -->
-        <div class="p-6">
+        <div class="p-3 sm:p-6">
             {% if object_list %}
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarifas</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mensual</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for category in object_list %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-700">
-                                    <div>Primera hora: ${{ category.first_hour_rate|intcomma }}</div>
-                                    <div>Hora adicional: ${{ category.additional_hour_rate|intcomma }}</div>
+                <!-- Vista Desktop: Tabla -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tarifas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Mensual</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for category in object_list %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                            <i class="fas fa-tag text-blue-600"></i>
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-700">
+                                        <div class="mb-1">
+                                            <span class="text-green-600 font-semibold">Primera hora: ${{ category.first_hour_rate|intcomma }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-blue-600 font-semibold">Hora adicional: ${{ category.additional_hour_rate|intcomma }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-700">
+                                        {% if category.is_monthly %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-1">
+                                                <i class="fas fa-check mr-1"></i>Sí
+                                            </span>
+                                            <div class="text-purple-600 font-semibold">${{ category.monthly_rate|intcomma }}</div>
+                                        {% else %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                <i class="fas fa-times mr-1"></i>No
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex space-x-2">
+                                        <a href="{% url 'category-edit' pk=category.id %}" class="text-blue-600 hover:text-blue-900 p-1 rounded" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button onclick="deleteCategory('{{ category.id }}')" class="text-red-600 hover:text-red-900 p-1 rounded" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Vista Mobile: Cards -->
+                <div class="md:hidden space-y-4">
+                    {% for category in object_list %}
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center flex-1 min-w-0">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                    <i class="fas fa-tag text-blue-600"></i>
                                 </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-700">
-                                    <div>¿Mensual?: {% if category.is_monthly %}Sí{% else %}No{% endif %}</div>
+                                <h3 class="text-lg font-semibold text-gray-900 truncate">{{ category.name }}</h3>
+                            </div>
+                            <div class="flex space-x-2 ml-3">
+                                <a href="{% url 'category-edit' pk=category.id %}" class="text-blue-600 hover:text-blue-900 p-2 rounded-lg bg-blue-50 border border-blue-200 transition-colors" title="Editar">
+                                    <i class="fas fa-edit text-sm"></i>
+                                </a>
+                                <button onclick="deleteCategory('{{ category.id }}')" class="text-red-600 hover:text-red-900 p-2 rounded-lg bg-red-50 border border-red-200 transition-colors" title="Eliminar">
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <!-- Primera Hora -->
+                            <div class="bg-green-50 rounded-lg p-3 border border-green-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Primera hora:</span>
+                                    <span class="text-green-600 font-bold">${{ category.first_hour_rate|intcomma }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Hora Adicional -->
+                            <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Hora adicional:</span>
+                                    <span class="text-blue-600 font-bold">${{ category.additional_hour_rate|intcomma }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Mensual -->
+                            <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Mensual:</span>
                                     {% if category.is_monthly %}
-                                    <div>Tarifa: ${{ category.monthly_rate|intcomma }}</div>
+                                        <div class="text-right">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-1">
+                                                <i class="fas fa-check mr-1"></i>Sí
+                                            </span>
+                                            <div class="text-purple-600 font-bold text-sm">${{ category.monthly_rate|intcomma }}</div>
+                                        </div>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            <i class="fas fa-times mr-1"></i>No
+                                        </span>
                                     {% endif %}
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{% url 'category-edit' pk=category.id %}" class="text-blue-600 hover:text-blue-900 mr-3">Editar</a>
-                                <button onclick="deleteCategory('{{ category.id }}')" class="text-red-600 hover:text-red-900">Eliminar</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             {% else %}
-            <div class="text-center py-8">
-                <p class="text-gray-500">No hay categorías disponibles</p>
-                <a href="{% url 'category-create' %}" class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Crear primera categoría
-                </a>
-            </div>
+                <!-- Estado vacío -->
+                <div class="text-center py-8 sm:py-12">
+                    <i class="fas fa-tags text-4xl sm:text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg sm:text-xl text-gray-500 mb-2">No hay categorías disponibles</h3>
+                    <p class="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">Crea tu primera categoría de vehículo para comenzar</p>
+                    <a href="{% url 'category-create' %}"
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base">
+                        <i class="fas fa-plus mr-2"></i>Crear primera categoría
+                    </a>
+                </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<style>
+/* Asegurar responsividad completa */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    /* Hacer botones más grandes para touch */
+    .bg-blue-50, .bg-red-50 {
+        min-height: 40px;
+        min-width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Mejorar espaciado en móviles */
+    .space-y-4 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .space-y-3 > * + * {
+        margin-top: 0.75rem;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Reducir padding en pantallas muy pequeñas */
+    .p-4 {
+        padding: 0.75rem !important;
+    }
+    
+    .p-3 {
+        padding: 0.5rem !important;
+    }
+    
+    /* Texto más pequeño en móviles */
+    .text-lg {
+        font-size: 1rem !important;
+    }
+    
+    .text-sm {
+        font-size: 0.8rem !important;
+    }
+}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
